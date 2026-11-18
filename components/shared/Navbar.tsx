@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 const links = [
   { label: "Home", href: "/" },
@@ -28,8 +29,16 @@ const Navbar = () => {
         <Link
           href="/"
           onClick={() => setIsOpen(false)}
-          className="text-[1.35rem] leading-none font-extrabold tracking-[-0.03em] text-[#2a1509] transition-opacity hover:opacity-80 md:text-2xl"
+          className="flex items-center gap-2 text-[1.35rem] leading-none font-extrabold tracking-[-0.03em] text-[#2a1509] transition-opacity hover:opacity-80 md:text-2xl"
         >
+          <Image
+            src="/logo.png"
+            alt="PizzaHub Logo"
+            width={40}
+            height={40}
+            priority
+            className="h-16 w-16 object-contain"
+          />
           Pizzahub
         </Link>
 
