@@ -32,11 +32,11 @@ export default function RootLayout({
         jakarta.variable
       )}
     >
-      <body>
+      <body className="flex min-h-screen flex-col">
         <ThemeProvider>
-          <Navbar></Navbar>
+          <Navbar />
           <main className="flex-1">{children}</main>
-          <Footer></Footer>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

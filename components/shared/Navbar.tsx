@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -65,13 +66,26 @@ const Navbar = () => {
         <div className="hidden items-center gap-2 md:flex">
           <Link
             href="/sign-in"
-            className="rounded-full px-4 py-2.5 text-sm font-semibold text-[#3a2416] transition-colors hover:bg-[#2f1a0d]/6 hover:text-[#2a1509]"
+            aria-current={pathname === "/sign-in" ? "page" : undefined}
+            className={cn(
+              "rounded-full px-4 py-2.5 text-sm font-semibold transition-colors",
+              pathname === "/sign-in"
+                ? "bg-[#f6c445] text-[#2a1509]"
+                : "text-[#3a2416] hover:bg-[#2f1a0d]/6 hover:text-[#2a1509]"
+            )}
           >
             Sign In
           </Link>
+
           <Link
             href="/sign-up"
-            className="rounded-full bg-[#f6c445] px-5 py-2.5 text-sm font-semibold text-[#2a1509] transition-colors hover:bg-[#ffd45e] focus-visible:ring-3 focus-visible:ring-[#f6c445]/40 focus-visible:outline-none"
+            aria-current={pathname === "/sign-up" ? "page" : undefined}
+            className={cn(
+              "rounded-full px-5 py-2.5 text-sm font-semibold transition-colors",
+              pathname === "/sign-up"
+                ? "bg-[#f6c445] text-[#2a1509]"
+                : "text-[#3a2416] hover:bg-[#2f1a0d]/6 hover:text-[#2a1509]"
+            )}
           >
             Sign Up
           </Link>
@@ -121,14 +135,27 @@ const Navbar = () => {
             <Link
               href="/sign-in"
               onClick={() => setIsOpen(false)}
-              className="flex-1 rounded-full border border-[#2f1a0d]/15 px-4 py-2.5 text-center text-sm font-semibold text-[#3a2416] transition-colors hover:bg-[#2f1a0d]/6"
+              aria-current={pathname === "/sign-in" ? "page" : undefined}
+              className={cn(
+                "flex-1 rounded-full border px-4 py-2.5 text-center text-sm font-semibold transition-colors",
+                pathname === "/sign-in"
+                  ? "border-[#f6c445] bg-[#f6c445] text-[#2a1509]"
+                  : "border-[#2f1a0d]/15 text-[#3a2416] hover:bg-[#2f1a0d]/6"
+              )}
             >
               Sign In
             </Link>
+
             <Link
               href="/sign-up"
               onClick={() => setIsOpen(false)}
-              className="flex-1 rounded-full bg-[#f6c445] px-4 py-2.5 text-center text-sm font-semibold text-[#2a1509] transition-colors hover:bg-[#ffd45e]"
+              aria-current={pathname === "/sign-up" ? "page" : undefined}
+              className={cn(
+                "flex-1 rounded-full px-4 py-2.5 text-center text-sm font-semibold transition-colors",
+                pathname === "/sign-up"
+                  ? "bg-[#f6c445] text-[#2a1509]"
+                  : "text-[#3a2416] hover:bg-[#2f1a0d]/6"
+              )}
             >
               Sign Up
             </Link>
