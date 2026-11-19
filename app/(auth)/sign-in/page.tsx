@@ -1,12 +1,12 @@
-
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 import { Check, Eye, EyeOff } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -44,7 +44,11 @@ const googleButtonClass =
 
 const SignInPage = () => {
   const pathname = usePathname()
+  const router = useRouter()
+
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Form values
   const [values, setValues] = useState({
@@ -70,17 +74,41 @@ const SignInPage = () => {
     }
 
   // Form submission
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setError(null)
 
-    const payload = {
-      email: values.email,
-      password: values.password,
-      remember: String(values.remember),
+    // Password minimum length validation
+    if (values.password.length < 6) {
+      setError("Password must be at least 6 characters.")
+      return
     }
 
-    // TODO: connect better-auth here, e.g. authClient.signIn.email(payload)
-    console.log("Sign in submitted:", payload)
+    try {
+      setIsLoading(true)
+
+      const { data, error } = await authClient.signIn.email({
+        email: values.email,
+        password: values.password,
+        rememberMe: values.remember,
+        callbackURL: "/",
+      })
+
+      if (error) {
+        setError(error.message || "Invalid email or password.")
+        return
+      }
+
+      if (data) {
+        router.push("/")
+        router.refresh()
+      }
+    } catch (err) {
+      console.error("Sign in error:", err)
+      setError("Something went wrong. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -212,12 +240,20 @@ const SignInPage = () => {
               Keep me signed in
             </label>
 
+            {/* Error Message */}
+            {error && (
+              <p className="text-sm text-red-600" role="alert">
+                {error}
+              </p>
+            )}
+
             {/* Sign In Button */}
             <Button
               type="submit"
-              className="h-11 w-full rounded-full bg-[#f6c445] text-sm font-semibold text-[#2a1509] transition-colors hover:bg-[#ffd45e]"
+              disabled={isLoading}
+              className="h-11 w-full rounded-full bg-[#f6c445] text-sm font-semibold text-[#2a1509] transition-colors hover:bg-[#ffd45e] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Sign In
+              {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 

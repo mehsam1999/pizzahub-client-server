@@ -2,11 +2,12 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 import { Check, Eye, EyeOff } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -44,8 +45,11 @@ const googleButtonClass =
 
 const SignUpPage = () => {
   const pathname = usePathname()
+  const router = useRouter()
+
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Form values
   const [values, setValues] = useState({
@@ -59,6 +63,8 @@ const SignUpPage = () => {
   // Reusable setField function
   const setField = (field: keyof typeof values) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      setError(null)
+
       if (field === "terms") {
         setValues((prev) => ({
           ...prev,
@@ -73,32 +79,70 @@ const SignUpPage = () => {
       }))
     }
 
-  // Form submission
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  // Better Auth Sign Up
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault()
     setError(null)
 
+    // Password validation
+    const passwordValidation =
+      values.password.length >= 6 &&
+      /[A-Z]/.test(values.password) &&
+      /[a-z]/.test(values.password)
+
+    if (!passwordValidation) {
+      setError(
+        "Password must be at least 6 characters and include one uppercase and one lowercase letter."
+      )
+      return
+    }
+
+    // Confirm password validation
     if (values.password !== values.confirmPassword) {
       setError("Passwords do not match. Please re-enter them.")
       return
     }
 
-    const payload = {
-      name: values.name,
-      email: values.email,
-      password: values.password,
-      confirmPassword: values.confirmPassword,
-      terms: String(values.terms),
+    // Terms validation
+    if (!values.terms) {
+      setError("Please accept the Terms of Service and Privacy Policy.")
+      return
     }
 
-    // TODO: connect better-auth here, e.g. authClient.signUp.email(payload)
-    console.log("Sign up submitted:", payload)
+    try {
+      setIsLoading(true)
+
+      const { data, error } = await authClient.signUp.email({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        callbackURL: "/",
+      })
+
+      if (error) {
+        setError(error.message || "Unable to create your account.")
+        return
+      }
+
+      if (data) {
+        router.push("/")
+        router.refresh()
+      }
+    } catch (err) {
+      console.error("Sign up error:", err)
+      setError("Something went wrong. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <section className="bg-gradient-to-b from-[#fdf6ec] via-[#fdf9f4] to-[#fbeee4] px-5 py-12 sm:px-6 sm:py-16 lg:py-20">
       <div className="mx-auto w-full max-w-md">
         <div className="rounded-3xl bg-white px-6 py-8 shadow-[0_28px_60px_-40px_rgba(61,32,16,0.5)] ring-1 ring-[#3d2010]/8 sm:px-8 sm:py-9">
+
           <Link
             href="/"
             className="block text-center font-serif text-xl font-bold tracking-tight text-[#3d2010] transition-opacity hover:opacity-80"
@@ -143,6 +187,7 @@ const SignUpPage = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+
             {/* Full Name */}
             <div className="space-y-2">
               <Label htmlFor="sign-up-name" className="text-[#3d2010]">
@@ -184,6 +229,7 @@ const SignUpPage = () => {
               <Label htmlFor="sign-up-password" className="text-[#3d2010]">
                 Password
               </Label>
+
               <div className="relative">
                 <Input
                   id="sign-up-password"
@@ -230,7 +276,7 @@ const SignUpPage = () => {
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 placeholder="Re-enter your password"
-                minLength={8}
+                minLength={6}
                 required
                 className="h-11 rounded-xl border-[#e2d2bf] bg-[#fdfaf6] px-3.5 text-[#3d2010] placeholder:text-[#a8907c] focus-visible:border-[#c99a3f] focus-visible:ring-[#f6c445]/40"
               />
@@ -246,6 +292,7 @@ const SignUpPage = () => {
                 required
                 className="peer sr-only"
               />
+
               <span
                 aria-hidden
                 className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-[#d8c4ae] bg-white transition-colors peer-checked:border-[#3d2010] peer-checked:bg-[#3d2010] peer-focus-visible:ring-2 peer-focus-visible:ring-[#f6c445]/60 peer-focus-visible:ring-offset-1 [&>svg]:opacity-0 peer-checked:[&>svg]:opacity-100"
@@ -275,9 +322,10 @@ const SignUpPage = () => {
             {/* Create Account */}
             <Button
               type="submit"
-              className="h-11 w-full rounded-full bg-[#f6c445] text-sm font-semibold text-[#2a1509] transition-colors hover:bg-[#ffd45e]"
+              disabled={isLoading}
+              className="h-11 w-full rounded-full bg-[#f6c445] text-sm font-semibold text-[#2a1509] transition-colors hover:bg-[#ffd45e] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Create Account
+              {isLoading ? "Creating account..." : "Create Account"}
             </Button>
           </form>
 
@@ -304,7 +352,7 @@ const SignUpPage = () => {
           <button
             type="button"
             onClick={() => {
-              // TODO: wire up authClient.signUp.social({ provider: "google" })
+              // TODO: wire up authClient.signIn.social({ provider: "google" })
               console.log("Continue with Google clicked")
             }}
             className={googleButtonClass}
