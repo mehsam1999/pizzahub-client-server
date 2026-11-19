@@ -26,11 +26,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-const links = [
-  { label: "Home", href: "/" },
-  { label: "Browse Menu", href: "/menu" },
-]
-
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const { data: session, refetch } = useSession()
@@ -39,6 +34,14 @@ const Navbar = () => {
 
   const user = session?.user
   const userRole = (user as typeof user & { role?: string })?.role || "customer"
+
+  const dashboardHref = `/dashboard/${userRole}`
+
+  const links = [
+    { label: "Home", href: "/" },
+    { label: "Browse Menu", href: "/menu" },
+    ...(user ? [{ label: "Dashboard", href: dashboardHref }] : []),
+  ]
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href)
@@ -86,7 +89,7 @@ const Navbar = () => {
 
           <DropdownMenuItem>
             <Link
-              href="/dashboard"
+              href={dashboardHref}
               className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2"
             >
               <LayoutDashboard className="size-4" />
@@ -236,18 +239,7 @@ const Navbar = () => {
 
           <div className="mt-3 flex items-center gap-2 border-t border-[#2f1a0d]/10 pt-4">
             {user ? (
-              <div className="flex w-full items-center justify-between">
-                {userDropdown}
-
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
-                >
-                  <LogOut className="size-4" />
-                  Sign out
-                </button>
-              </div>
+              <div className="flex w-full items-center">{userDropdown}</div>
             ) : (
               <>
                 <Link

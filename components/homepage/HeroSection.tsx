@@ -26,20 +26,29 @@ const HeroSection = () => {
           <div aria-hidden className="hidden lg:block" />
 
           <div className="max-w-xl">
-            <h1 className="text-[2rem] leading-[0.98] font-extrabold tracking-[-0.02em] text-[#f8f0dc] uppercase min-[420px]:text-[2.4rem] sm:text-[3rem] md:text-[3.6rem] lg:text-[3.05rem] xl:text-[3.85rem]">
+            <h1
+              className="hero-rise text-[2rem] leading-[0.98] font-extrabold tracking-[-0.02em] text-[#f8f0dc] uppercase min-[420px]:text-[2.4rem] sm:text-[3rem] md:text-[3.6rem] lg:text-[3.05rem] xl:text-[3.85rem]"
+              style={{ animationDelay: "0ms" }}
+            >
               <span className="block">Crafted with</span>
               <span className="block text-[#f7c445]">Passion.</span>
               <span className="block">Delivered with</span>
               <span className="block text-[#f7c445]">Love.</span>
             </h1>
 
-            <p className="mt-6 max-w-lg text-[0.95rem] leading-relaxed text-[#efe3cd]/85 sm:text-base md:text-[1.0625rem]">
+            <p
+              className="hero-rise mt-6 max-w-lg text-[0.95rem] leading-relaxed text-[#efe3cd]/85 sm:text-base md:text-[1.0625rem]"
+              style={{ animationDelay: "90ms" }}
+            >
               Discover exceptional pizzas from your favorite local restaurants.
               Explore delicious flavors and bring artisan happiness straight to
               your doorstep.
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
+            <div
+              className="hero-rise mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4"
+              style={{ animationDelay: "180ms" }}
+            >
               <Link
                 href="/menu"
                 className="group inline-flex h-12 items-center gap-2 rounded-full bg-[#f7c445] px-6 text-sm font-semibold text-[#231306] shadow-[0_10px_30px_-10px_rgba(247,196,69,0.7)] transition-colors hover:bg-[#ffd45e] focus-visible:ring-3 focus-visible:ring-[#f7c445]/50 focus-visible:outline-none sm:h-13 sm:px-7 sm:text-[15px]"

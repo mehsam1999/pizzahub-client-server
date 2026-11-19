@@ -127,3 +127,37 @@
     @apply font-sans;
     }
 }
+
+/* Hero entrance. Pure CSS so it paints before hydration and never hides
+   content when scripting is unavailable. */
+@keyframes pizzahub-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-rise {
+  animation: pizzahub-rise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-rise {
+    animation: none;
+  }
+}
+
+/* Motion writes opacity:0 into the SSR markup for `initial="hidden"`,
+   including on staggered children. Only let that take effect in browsers
+   that can run the animation. */
+@media (scripting: none) {
+  .motion-reveal,
+  .motion-reveal * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

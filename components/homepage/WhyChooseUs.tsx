@@ -1,12 +1,17 @@
+"use client"
+
 import type { LucideIcon } from "lucide-react"
 import { MousePointerClick, Store, Tag, Truck } from "lucide-react"
+import * as motion from "motion/react-client"
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+  fadeUp,
+  revealClass,
+  staggerContainer,
+  viewportOnce,
+} from "./motion-variants"
 
 type Feature = {
   icon: LucideIcon
@@ -50,30 +55,52 @@ const WhyChooseUs = () => {
     >
       <div className="mx-auto max-w-7xl">
         {/* Section heading */}
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-semibold tracking-[0.18em] text-[#b07d3f] uppercase sm:text-xs">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className={cn(revealClass, "mx-auto max-w-2xl text-center")}
+        >
+          <motion.p
+            variants={fadeUp}
+            className="text-[11px] font-semibold tracking-[0.18em] text-[#b07d3f] uppercase sm:text-xs"
+          >
             The PizzaHub Standard
-          </p>
-          <h2
+          </motion.p>
+          <motion.h2
+            variants={fadeUp}
             id="why-choose-us-heading"
             className="mt-3 font-serif text-[1.75rem] leading-tight font-bold text-[#3d2010] sm:text-4xl"
           >
             Why Choose PizzaHub?
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-[#6b5a4e] sm:text-[15px]">
+          </motion.h2>
+          <motion.p
+            variants={fadeUp}
+            className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-[#6b5a4e] sm:text-[15px]"
+          >
             The gold standard in curated local pizza delivery. We partner
             exclusively with craft kitchens adhering to authentic fermentation
             and premium ingredient standards.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Feature cards */}
-        <ul className="mt-10 grid grid-cols-1 gap-5 sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+        <motion.ul
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className={cn(
+            revealClass,
+            "mt-10 grid grid-cols-1 gap-5 sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
+          )}
+        >
           {features.map(({ icon: Icon, title, description }) => (
-            <li key={title} className="h-full">
+            <motion.li key={title} variants={fadeUp} className="h-full">
               <Card
                 size="sm"
-                className="h-full gap-5 rounded-2xl bg-[#fdf2e5] py-6 text-card-foreground ring-1 ring-[#e8d3ba]/50 [--card-spacing:1.25rem] sm:[--card-spacing:1.5rem]"
+                className="h-full gap-5 rounded-2xl bg-[#fdf2e5] py-6 text-card-foreground ring-1 ring-[#e8d3ba]/50 transition-shadow duration-300 hover:shadow-[0_18px_40px_-28px_rgba(61,32,16,0.45)] [--card-spacing:1.25rem] sm:[--card-spacing:1.5rem]"
               >
                 <CardHeader className="gap-4">
                   <span
@@ -96,9 +123,9 @@ const WhyChooseUs = () => {
                   </p>
                 </CardContent>
               </Card>
-            </li>
+            </motion.li>
           ))}
-        </ul>
+        </motion.ul>
       </div>
     </section>
   )
