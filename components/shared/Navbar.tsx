@@ -1,13 +1,30 @@
-
 "use client"
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Menu, X } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import {
+  Menu,
+  X,
+  ChevronDown,
+  LayoutDashboard,
+  UserRound,
+  LogOut,
+} from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import Image from "next/image"
+import { authClient, useSession } from "@/lib/auth-client"
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const links = [
   { label: "Home", href: "/" },
@@ -16,10 +33,90 @@ const links = [
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const { data: session, refetch } = useSession()
   const pathname = usePathname()
+  const router = useRouter()
+
+  const user = session?.user
+  const userRole = (user as typeof user & { role?: string })?.role || "customer"
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href)
+
+  // Sign out
+  const handleSignOut = async () => {
+    const { error } = await authClient.signOut()
+
+    if (!error) {
+      await refetch()
+      setIsOpen(false)
+      router.replace("/")
+    }
+  }
+
+  // User Dropdown
+  const userDropdown = (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex items-center gap-2 rounded-full p-1.5 transition-colors hover:bg-[#2f1a0d]/6 focus-visible:ring-2 focus-visible:ring-[#f6c445]/50 focus-visible:outline-none">
+        <span className="flex size-10 items-center justify-center rounded-full bg-[#f6e5d2] font-semibold text-[#421d0d]">
+          {user?.name?.charAt(0).toUpperCase() || "U"}
+        </span>
+
+        <span className="max-w-28 truncate text-sm font-semibold text-[#2a1509]">
+          {user?.name}
+        </span>
+
+        <ChevronDown className="size-4 text-[#3a2416]" />
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        align="end"
+        className="w-72 rounded-2xl border-[#e2d2bf] bg-[#fcf8ee] p-2 shadow-xl"
+      >
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="px-3 py-3 font-normal">
+            <p className="text-base font-bold text-[#2a1509]">{user?.name}</p>
+
+            <p className="mt-1 truncate text-sm text-[#8a7565]">
+              {user?.email} · {userRole}
+            </p>
+          </DropdownMenuLabel>
+
+          <DropdownMenuSeparator className="bg-[#e2d2bf]" />
+
+          <DropdownMenuItem>
+            <Link
+              href="/dashboard"
+              className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2"
+            >
+              <LayoutDashboard className="size-4" />
+              Dashboard
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem>
+            <Link
+              href="/profile"
+              className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2"
+            >
+              <UserRound className="size-4" />
+              Profile settings
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator className="bg-[#e2d2bf]" />
+
+          <DropdownMenuItem
+            onClick={handleSignOut}
+            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-red-600 focus:bg-red-50 focus:text-red-600"
+          >
+            <LogOut className="size-4" />
+            Sign out
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#2f1a0d]/10 bg-[#fcf8ee]/95 backdrop-blur-md">
@@ -64,31 +161,37 @@ const Navbar = () => {
 
         {/* Desktop auth actions */}
         <div className="hidden items-center gap-2 md:flex">
-          <Link
-            href="/sign-in"
-            aria-current={pathname === "/sign-in" ? "page" : undefined}
-            className={cn(
-              "rounded-full px-4 py-2.5 text-sm font-semibold transition-colors",
-              pathname === "/sign-in"
-                ? "bg-[#f6c445] text-[#2a1509]"
-                : "text-[#3a2416] hover:bg-[#2f1a0d]/6 hover:text-[#2a1509]"
-            )}
-          >
-            Sign In
-          </Link>
+          {user ? (
+            userDropdown
+          ) : (
+            <>
+              <Link
+                href="/sign-in"
+                aria-current={pathname === "/sign-in" ? "page" : undefined}
+                className={cn(
+                  "rounded-full px-4 py-2.5 text-sm font-semibold transition-colors",
+                  pathname === "/sign-in"
+                    ? "bg-[#f6c445] text-[#2a1509]"
+                    : "text-[#3a2416] hover:bg-[#2f1a0d]/6 hover:text-[#2a1509]"
+                )}
+              >
+                Sign In
+              </Link>
 
-          <Link
-            href="/sign-up"
-            aria-current={pathname === "/sign-up" ? "page" : undefined}
-            className={cn(
-              "rounded-full px-5 py-2.5 text-sm font-semibold transition-colors",
-              pathname === "/sign-up"
-                ? "bg-[#f6c445] text-[#2a1509]"
-                : "text-[#3a2416] hover:bg-[#2f1a0d]/6 hover:text-[#2a1509]"
-            )}
-          >
-            Sign Up
-          </Link>
+              <Link
+                href="/sign-up"
+                aria-current={pathname === "/sign-up" ? "page" : undefined}
+                className={cn(
+                  "rounded-full px-5 py-2.5 text-sm font-semibold transition-colors",
+                  pathname === "/sign-up"
+                    ? "bg-[#f6c445] text-[#2a1509]"
+                    : "text-[#3a2416] hover:bg-[#2f1a0d]/6 hover:text-[#2a1509]"
+                )}
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -132,33 +235,50 @@ const Navbar = () => {
           ))}
 
           <div className="mt-3 flex items-center gap-2 border-t border-[#2f1a0d]/10 pt-4">
-            <Link
-              href="/sign-in"
-              onClick={() => setIsOpen(false)}
-              aria-current={pathname === "/sign-in" ? "page" : undefined}
-              className={cn(
-                "flex-1 rounded-full border px-4 py-2.5 text-center text-sm font-semibold transition-colors",
-                pathname === "/sign-in"
-                  ? "border-[#f6c445] bg-[#f6c445] text-[#2a1509]"
-                  : "border-[#2f1a0d]/15 text-[#3a2416] hover:bg-[#2f1a0d]/6"
-              )}
-            >
-              Sign In
-            </Link>
+            {user ? (
+              <div className="flex w-full items-center justify-between">
+                {userDropdown}
 
-            <Link
-              href="/sign-up"
-              onClick={() => setIsOpen(false)}
-              aria-current={pathname === "/sign-up" ? "page" : undefined}
-              className={cn(
-                "flex-1 rounded-full px-4 py-2.5 text-center text-sm font-semibold transition-colors",
-                pathname === "/sign-up"
-                  ? "bg-[#f6c445] text-[#2a1509]"
-                  : "text-[#3a2416] hover:bg-[#2f1a0d]/6"
-              )}
-            >
-              Sign Up
-            </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
+                >
+                  <LogOut className="size-4" />
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/sign-in"
+                  onClick={() => setIsOpen(false)}
+                  aria-current={pathname === "/sign-in" ? "page" : undefined}
+                  className={cn(
+                    "flex-1 rounded-full border px-4 py-2.5 text-center text-sm font-semibold transition-colors",
+                    pathname === "/sign-in"
+                      ? "border-[#f6c445] bg-[#f6c445] text-[#2a1509]"
+                      : "border-[#2f1a0d]/15 text-[#3a2416] hover:bg-[#2f1a0d]/6"
+                  )}
+                >
+                  Sign In
+                </Link>
+
+                <Link
+                  href="/sign-up"
+                  onClick={() => setIsOpen(false)}
+                  aria-current={pathname === "/sign-up" ? "page" : undefined}
+                  className={cn(
+                    "flex-1 rounded-full px-4 py-2.5 text-center text-sm font-semibold transition-colors",
+                    pathname === "/sign-up"
+                      ? "bg-[#f6c445] text-[#2a1509]"
+                      : "text-[#3a2416] hover:bg-[#2f1a0d]/6"
+                  )}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

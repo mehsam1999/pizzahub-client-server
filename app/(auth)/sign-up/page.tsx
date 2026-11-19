@@ -1,13 +1,13 @@
-
 "use client"
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
-import { Check, Eye, EyeOff } from "lucide-react"
+import { Check, Eye, EyeOff, ShieldCheck, Store, User } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { authClient } from "@/lib/auth-client"
+import type { Role } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,6 +16,32 @@ const tabs = [
   { label: "Sign In", href: "/sign-in" },
   { label: "Sign Up", href: "/sign-up" },
 ] as const
+
+const roleOptions = [
+  {
+    value: "customer",
+    label: "Customer",
+    description: "Order pizzas",
+    icon: User,
+  },
+  {
+    value: "vendor",
+    label: "Vendor",
+    description: "Sell your menu",
+    icon: Store,
+  },
+  {
+    value: "admin",
+    label: "Admin",
+    description: "Manage platform",
+    icon: ShieldCheck,
+  },
+] satisfies {
+  value: Role
+  label: string
+  description: string
+  icon: typeof User
+}[]
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -57,11 +83,13 @@ const SignUpPage = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "customer" as Role,
     terms: false,
   })
 
   // Reusable setField function
-  const setField = (field: keyof typeof values) =>
+  const setField =
+    (field: keyof typeof values) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setError(null)
 
@@ -80,9 +108,7 @@ const SignUpPage = () => {
     }
 
   // Better Auth Sign Up
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError(null)
 
@@ -118,6 +144,7 @@ const SignUpPage = () => {
         name: values.name,
         email: values.email,
         password: values.password,
+        role: values.role,
         callbackURL: "/",
       })
 
@@ -142,7 +169,6 @@ const SignUpPage = () => {
     <section className="bg-gradient-to-b from-[#fdf6ec] via-[#fdf9f4] to-[#fbeee4] px-5 py-12 sm:px-6 sm:py-16 lg:py-20">
       <div className="mx-auto w-full max-w-md">
         <div className="rounded-3xl bg-white px-6 py-8 shadow-[0_28px_60px_-40px_rgba(61,32,16,0.5)] ring-1 ring-[#3d2010]/8 sm:px-8 sm:py-9">
-
           <Link
             href="/"
             className="block text-center font-serif text-xl font-bold tracking-tight text-[#3d2010] transition-opacity hover:opacity-80"
@@ -187,6 +213,67 @@ const SignUpPage = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+            
+            {/* Account type */}
+            <fieldset className="space-y-2">
+              <legend className="text-sm font-medium text-[#3d2010]">
+               Join PizzaHUb as
+              </legend>
+
+              <div className="grid grid-cols-3 gap-2">
+                {roleOptions.map((option) => {
+                  const Icon = option.icon
+                  const isSelected = values.role === option.value
+
+                  return (
+                    <label
+                      key={option.value}
+                      className={cn(
+                        "flex cursor-pointer flex-col items-center gap-1 rounded-xl border px-2 py-3 text-center transition-colors",
+                        isSelected
+                          ? "border-[#3d2010] bg-[#3d2010] text-[#fdf6e3]"
+                          : "border-[#e2d2bf] bg-[#fdfaf6] text-[#6b5a4e] hover:border-[#c99a3f] hover:bg-[#fbf3e8]",
+                        "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#f6c445]/60"
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name="role"
+                        value={option.value}
+                        checked={isSelected}
+                        onChange={() =>
+                          setValues((prev) => ({
+                            ...prev,
+                            role: option.value,
+                          }))
+                        }
+                        className="sr-only"
+                      />
+
+                      <Icon
+                        aria-hidden
+                        className={cn(
+                          "size-4",
+                          isSelected ? "text-[#f6c445]" : "text-[#a2743a]"
+                        )}
+                      />
+
+                      <span className="text-[12px] leading-none font-semibold">
+                        {option.label}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-[10px] leading-tight",
+                          isSelected ? "text-[#e4d3c2]" : "text-[#a8907c]"
+                        )}
+                      >
+                        {option.description}
+                      </span>
+                    </label>
+                  )
+                })}
+              </div>
+            </fieldset>
 
             {/* Full Name */}
             <div className="space-y-2">
