@@ -12,4 +12,16 @@ export type MenuItemForm = {
 
 export type MenuItem = MenuItemForm & {
   _id: number
+  vendorId?: string
+  vendorName?: string
+  vendor?: { _id?: string; name?: string } | string
+}
+
+export function getMenuItemVendorName(item: MenuItem) {
+  const name =
+    typeof item.vendor === "string"
+      ? item.vendor
+      : (item.vendor?.name ?? item.vendorName)
+
+  return name?.trim() || undefined
 }
