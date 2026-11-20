@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ImageIcon, MapPin, Plus, Sparkles, X } from "lucide-react"
+import { ImageIcon, MapPin, Plus, Utensils, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -56,6 +56,14 @@ const AddMenuItemPage = () => {
     (value: MenuItemForm[K]) =>
       setForm((prev) => ({ ...prev, [key]: value }))
 
+  const isFormInvalid =
+    !form.name.trim() ||
+    !form.category ||
+    !form.price.trim() ||
+    !form.description.trim() ||
+    !form.location.trim() ||
+    !form.imageUrl.trim()
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -74,7 +82,7 @@ const AddMenuItemPage = () => {
     <div className="max-w-8xl mx-auto w-full px-4 py-8 sm:px-6 sm:py-10">
       {/* Eyebrow */}
       <p className="flex items-center gap-2 text-[10px] font-semibold tracking-[0.2em] text-[#421d0d] uppercase">
-        <Sparkles className="size-3.5 text-[#c8815a]" aria-hidden />
+        <Utensils className="size-3.5 text-[#c8815a]" aria-hidden />
         Culinary Registry &bull; Artisan Submission
       </p>
 
@@ -313,6 +321,7 @@ const AddMenuItemPage = () => {
 
               <Button
                 type="submit"
+                disabled={isFormInvalid}
                 className="h-10 flex-1 rounded-lg bg-[#421d0d] px-5 font-semibold text-[#fdf6e3] hover:bg-[#2f1a0d] sm:flex-none"
               >
                 <Plus aria-hidden />
