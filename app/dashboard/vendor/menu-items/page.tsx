@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useMemo, useState } from "react"
-import { Eye, Pencil, Plus, Search, Trash2, Utensils } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { Eye, Pencil, Plus, Search, Utensils } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table"
 import type { MenuItemForm } from "./new/page"
 import { getMenus } from "@/lib/api/getMenus"
+import { DeleteMenuDialog } from "@/app/components/DeleteMenuDialog"
 
 const CATEGORIES = [
   "Classic Pizzas",
@@ -33,20 +34,23 @@ const CATEGORIES = [
   "Beverages & Desserts",
 ] as const
 
-type MenuItem = MenuItemForm & {
-  id: number
+export type MenuItem = MenuItemForm & {
+  _id: number
   status: "Approved" | "Pending" | "Rejected"
 }
-
-const menus: MenuItem[] = await getMenus()
 
 const PAGE_SIZE = 6
 
 export default function MyMenuItemsPage() {
+  const [menus, setMenus] = useState<MenuItem[]>([])
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState("all")
   const [status, setStatus] = useState("all")
   const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    getMenus().then(setMenus)
+  }, [])
 
   const filteredItems = useMemo(
     () =>
@@ -61,7 +65,7 @@ export default function MyMenuItemsPage() {
           (status === "all" || item.status === status)
         )
       }),
-    [query, category, status]
+    [menus, query, category, status]
   )
 
   const pageCount = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE))
@@ -194,7 +198,7 @@ export default function MyMenuItemsPage() {
             <TableBody>
               {pageItems.map((item) => (
                 <TableRow
-                  key={item.id}
+                  key={item._id}
                   className={`border-[#421d0d]/5 ${item.status === "Rejected" ? "opacity-60" : ""}`}
                 >
                   <TableCell className="px-4 py-2.5">
@@ -260,14 +264,7 @@ export default function MyMenuItemsPage() {
                         <Pencil className="size-4" />
                       </Button>
 
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`Delete ${item.name}`}
-                        className="size-8 rounded-md bg-[#fdf0e4] text-red-600 hover:bg-red-50"
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
+                      <DeleteMenuDialog item={item}></DeleteMenuDialog>
                     </div>
                   </TableCell>
                 </TableRow>

@@ -6,6 +6,7 @@ import MotionProvider from "@/components/motion-provider"
 import { cn } from "@/lib/utils"
 import Navbar from "@/components/shared/Navbar"
 import SiteFooter from "@/components/shared/SiteFooter"
+import { Toaster } from "@/components/ui/toast"
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body className="flex min-h-screen flex-col">
         <ThemeProvider>
           <MotionProvider>
+            <Toaster />
             <Navbar />
             <main className="flex-1">{children}</main>
             <SiteFooter />

@@ -33,6 +33,7 @@ export type MenuItemForm = {
   description: string
   location: string
   imageUrl: string
+  status: "Approved" | "Pending" | "Rejected"
 }
 
 const EMPTY_FORM: MenuItemForm = {
@@ -42,8 +43,8 @@ const EMPTY_FORM: MenuItemForm = {
   description: "",
   location: "",
   imageUrl: "",
+  status: "Pending",
 }
-
 const fieldClass =
   "h-11 rounded-lg border-transparent bg-[#fdf2e5] px-3.5 text-sm text-[#421d0d] placeholder:text-[#6b5a4e]/60 focus-visible:border-[#f6c445] focus-visible:ring-[#f6c445]/30"
 
