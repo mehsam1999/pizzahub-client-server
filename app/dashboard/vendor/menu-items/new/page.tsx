@@ -7,7 +7,6 @@ import { ImageIcon, MapPin, Plus, Utensils, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -18,27 +17,16 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { createMenu } from "@/lib/actions/menu"
 import { toast } from "@/components/ui/toast"
+import {
+  MenuItemFormField,
+  menuItemFieldClass,
+} from "@/components/menu/menu-item-form-field"
+import { MENU_CATEGORIES } from "@/lib/constants/menu"
+import type { MenuItemForm } from "@/lib/types/menu"
 
-const CATEGORIES = [
-  "Classic Pizzas",
-  "Vegetarian Pizzas",
-  "Meat Lovers",
-  "Specialty / Gourmet Pizzas",
-  "Sides & Appetizers",
-  "Beverages & Desserts",
-] as const
+type MenuItemFormValues = Omit<MenuItemForm, "price"> & { price: string }
 
-export type MenuItemForm = {
-  name: string
-  category: string
-  price: string
-  description: string
-  location: string
-  imageUrl: string
-  status: "Approved" | "Pending" | "Rejected"
-}
-
-const EMPTY_FORM: MenuItemForm = {
+const EMPTY_FORM: MenuItemFormValues = {
   name: "",
   category: "",
   price: "",
@@ -47,17 +35,14 @@ const EMPTY_FORM: MenuItemForm = {
   imageUrl: "",
   status: "Pending",
 }
-const fieldClass =
-  "h-11 rounded-lg border-transparent bg-[#fdf2e5] px-3.5 text-sm text-[#421d0d] placeholder:text-[#6b5a4e]/60 focus-visible:border-[#f6c445] focus-visible:ring-[#f6c445]/30"
-
 const AddMenuItemPage = () => {
   const router = useRouter()
-  const [form, setForm] = useState<MenuItemForm>(EMPTY_FORM)
+  const [form, setForm] = useState<MenuItemFormValues>(EMPTY_FORM)
   const [saved, setSaved] = useState(false)
 
   const set =
-    <K extends keyof MenuItemForm>(key: K) =>
-    (value: MenuItemForm[K]) =>
+    <K extends keyof MenuItemFormValues>(key: K) =>
+    (value: MenuItemFormValues[K]) =>
       setForm((prev) => ({ ...prev, [key]: value }))
 
   const isFormInvalid =
@@ -71,7 +56,7 @@ const AddMenuItemPage = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    const menuItemData: MenuItemForm = { ...form }
+    const menuItemData: MenuItemForm = { ...form, price: Number(form.price) }
 
     console.log("New menu item form data:", menuItemData)
 
@@ -112,38 +97,24 @@ const AddMenuItemPage = () => {
       <Card className="mt-7 gap-0! rounded-2xl bg-white py-0! shadow-[0_24px_60px_-48px_rgba(66,29,13,0.55)] ring-1 ring-[#421d0d]/8">
         <form onSubmit={handleSubmit} className="p-4 sm:p-7">
           {/* Item name */}
-          <div className="space-y-2">
-            <div className="flex items-baseline justify-between gap-3">
-              <Label
-                htmlFor="item-name"
-                className="text-[13px] font-semibold text-[#421d0d]"
-              >
-                Item Name <span className="text-[#c8815a]">*</span>
-              </Label>
-            </div>
-
-            <Input
-              id="item-name"
-              value={form.name}
-              onChange={(event) => {
-                set("name")(event.target.value)
-                setSaved(false)
-              }}
-              placeholder="e.g. Burrata Pugliese & Prosciutto Crudo"
-              className={fieldClass}
-            />
+          <div>
+            <MenuItemFormField id="item-name" label="Item Name">
+                <Input
+                  id="item-name"
+                  value={form.name}
+                  onChange={(event) => {
+                    set("name")(event.target.value)
+                    setSaved(false)
+                  }}
+                  placeholder="e.g. Burrata Pugliese & Prosciutto Crudo"
+                  className={menuItemFieldClass}
+                />
+            </MenuItemFormField>
           </div>
 
           {/* Category + price */}
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label
-                htmlFor="item-category"
-                className="text-[13px] font-semibold text-[#421d0d]"
-              >
-                Category <span className="text-[#c8815a]">*</span>
-              </Label>
-
+            <MenuItemFormField id="item-category" label="Category">
               <Select
                 value={form.category}
                 onValueChange={(value) => {
@@ -155,29 +126,22 @@ const AddMenuItemPage = () => {
               >
                 <SelectTrigger
                   id="item-category"
-                  className={`${fieldClass} !h-11 w-full justify-between data-placeholder:text-[#6b5a4e]/60`}
+                  className={`${menuItemFieldClass} !h-11 w-full justify-between data-placeholder:text-[#6b5a4e]/60`}
                 >
                   <SelectValue placeholder="Select kitchen category" />
                 </SelectTrigger>
 
                 <SelectContent>
-                  {CATEGORIES.map((category) => (
+                  {MENU_CATEGORIES.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </MenuItemFormField>
 
-            <div className="space-y-2">
-              <Label
-                htmlFor="item-price"
-                className="text-[13px] font-semibold text-[#421d0d]"
-              >
-                Price <span className="text-[#c8815a]">*</span>
-              </Label>
-
+            <MenuItemFormField id="item-price" label="Price">
               <div className="relative">
                 <span
                   aria-hidden
@@ -198,22 +162,19 @@ const AddMenuItemPage = () => {
                     setSaved(false)
                   }}
                   placeholder="e.g. 24.50"
-                  className={`${fieldClass} h-11 pl-8`}
+                  className={`${menuItemFieldClass} h-11 pl-8`}
                 />
               </div>
-            </div>
+            </MenuItemFormField>
           </div>
 
           {/* Description */}
-          <div className="mt-6 space-y-2">
+          <MenuItemFormField
+            id="item-description"
+            label="Description"
+            className="mt-6"
+          >
             <div className="flex items-baseline justify-between gap-3">
-              <Label
-                htmlFor="item-description"
-                className="text-[13px] font-semibold text-[#421d0d]"
-              >
-                Description <span className="text-[#c8815a]">*</span>
-              </Label>
-
               <span className="text-[11px] text-[#6b5a4e] tabular-nums">
                 {form.description.length} / 600
               </span>
@@ -228,19 +189,16 @@ const AddMenuItemPage = () => {
               }}
               maxLength={600}
               placeholder="Describe dough fermentation (e.g. 48h poolish), key imported ingredients, and flavor profile..."
-              className={`${fieldClass} h-auto min-h-28 py-2.5`}
+              className={`${menuItemFieldClass} h-auto min-h-28 py-2.5`}
             />
-          </div>
+          </MenuItemFormField>
 
           {/* Location */}
-          <div className="mt-6 space-y-2">
-            <Label
-              htmlFor="item-location"
-              className="text-[13px] font-semibold text-[#421d0d]"
-            >
-              Location (Area / City) <span className="text-[#c8815a]">*</span>
-            </Label>
-
+          <MenuItemFormField
+            id="item-location"
+            label="Location (Area / City)"
+            className="mt-6"
+          >
             <div className="relative">
               <MapPin
                 aria-hidden
@@ -255,20 +213,17 @@ const AddMenuItemPage = () => {
                   setSaved(false)
                 }}
                 placeholder="e.g. Pizza Hut Dhanmondi, Dhaka"
-                className={`${fieldClass} pl-10`}
+                className={`${menuItemFieldClass} pl-10`}
               />
             </div>
-          </div>
+          </MenuItemFormField>
 
           {/* Image URL */}
-          <div className="mt-6 space-y-2">
-            <Label
-              htmlFor="item-image"
-              className="text-[13px] font-semibold text-[#421d0d]"
-            >
-              Item Image URL <span className="text-[#c8815a]">*</span>
-            </Label>
-
+          <MenuItemFormField
+            id="item-image"
+            label="Item Image URL"
+            className="mt-6"
+          >
             <div className="relative">
               <ImageIcon
                 aria-hidden
@@ -284,7 +239,7 @@ const AddMenuItemPage = () => {
                   setSaved(false)
                 }}
                 placeholder="https://example.com/my-dish.jpg"
-                className={`${fieldClass} pl-10`}
+                className={`${menuItemFieldClass} pl-10`}
               />
             </div>
 
@@ -302,7 +257,7 @@ const AddMenuItemPage = () => {
                 Paste a direct image link (JPG, PNG or WebP).
               </p>
             )}
-          </div>
+          </MenuItemFormField>
 
           {/* Actions */}
           <div className="mt-7 flex flex-col-reverse items-stretch gap-3 border-t border-[#421d0d]/8 pt-5 sm:flex-row sm:items-center sm:justify-between">

@@ -39,7 +39,7 @@ const Navbar = () => {
 
   const links = [
     { label: "Home", href: "/" },
-    { label: "Browse Menu", href: "/menu" },
+    { label: "Browse Menu", href: "/browse-menus" },
     ...(user ? [{ label: "Dashboard", href: dashboardHref }] : []),
   ]
 

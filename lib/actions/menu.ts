@@ -1,4 +1,4 @@
-import { MenuItemForm } from "@/app/dashboard/vendor/menu-items/new/page"
+import type { MenuItemForm } from "@/lib/types/menu"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 

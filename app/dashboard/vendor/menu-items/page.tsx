@@ -21,23 +21,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { MenuItemForm } from "./new/page"
+import { MENU_CATEGORIES } from "@/lib/constants/menu"
+import type { MenuItem } from "@/lib/types/menu"
 import { getMenus } from "@/lib/api/getMenus"
 import { DeleteMenuDialog } from "@/app/components/DeleteMenuDialog"
-
-const CATEGORIES = [
-  "Classic Pizzas",
-  "Vegetarian Pizzas",
-  "Meat Lovers",
-  "Specialty / Gourmet Pizzas",
-  "Sides & Appetizers",
-  "Beverages & Desserts",
-] as const
-
-export type MenuItem = MenuItemForm & {
-  _id: number
-  status: "Approved" | "Pending" | "Rejected"
-}
 
 const PAGE_SIZE = 6
 
@@ -127,7 +114,7 @@ export default function MyMenuItemsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All Categories</SelectItem>
-              {CATEGORIES.map((item) => (
+              {MENU_CATEGORIES.map((item) => (
                 <SelectItem key={item} value={item}>
                   {item}
                 </SelectItem>
