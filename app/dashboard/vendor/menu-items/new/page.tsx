@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { ImageIcon, MapPin, Plus, Utensils, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { createMenu } from "@/lib/actions/menu"
+import { toast } from "@/components/ui/toast"
 
 const CATEGORIES = [
   "Classic Pizzas",
@@ -49,6 +51,7 @@ const fieldClass =
   "h-11 rounded-lg border-transparent bg-[#fdf2e5] px-3.5 text-sm text-[#421d0d] placeholder:text-[#6b5a4e]/60 focus-visible:border-[#f6c445] focus-visible:ring-[#f6c445]/30"
 
 const AddMenuItemPage = () => {
+  const router = useRouter()
   const [form, setForm] = useState<MenuItemForm>(EMPTY_FORM)
   const [saved, setSaved] = useState(false)
 
@@ -72,17 +75,21 @@ const AddMenuItemPage = () => {
 
     console.log("New menu item form data:", menuItemData)
 
-    setForm(EMPTY_FORM)
-    setSaved(true)
-
-    const result = await createMenu(menuItemData)
-    console.log("CreateMenu result:", result)
+    try {
+      await createMenu(menuItemData)
+      setForm(EMPTY_FORM)
+      setSaved(true)
+      toast.add({ title: "Menu item added", description: "Your menu item was added successfully.", type: "success" })
+      router.push("/dashboard/vendor/menu-items")
+    } catch {
+      toast.add({ title: "Could not add menu item", description: "Please try again.", type: "error" })
+    }
   }
 
   return (
-    <div className="max-w-8xl mx-auto w-full px-4 py-8 sm:px-6 sm:py-10">
+    <div className="mx-auto w-full max-w-8xl px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
       {/* Eyebrow */}
-      <p className="flex items-center gap-2 text-[10px] font-semibold tracking-[0.2em] text-[#421d0d] uppercase">
+      <p className="flex items-center gap-2 text-[9px] font-semibold tracking-[0.12em] text-[#421d0d] uppercase sm:text-[10px] sm:tracking-[0.2em]">
         <Utensils className="size-3.5 text-[#c8815a]" aria-hidden />
         Culinary Registry &bull; Artisan Submission
       </p>
@@ -91,7 +98,7 @@ const AddMenuItemPage = () => {
         Add Menu Item
       </h1>
 
-      <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#6b5a4e]">
+      <p className="mt-2 max-w-xl text-xs leading-relaxed text-[#6b5a4e] sm:text-sm">
         Submit a new artisan dish to your kitchen&apos;s menu. New recipes
         undergo quality audit before appearing on the public marketplace.
       </p>
@@ -103,7 +110,7 @@ const AddMenuItemPage = () => {
       </div>
 
       <Card className="mt-7 gap-0! rounded-2xl bg-white py-0! shadow-[0_24px_60px_-48px_rgba(66,29,13,0.55)] ring-1 ring-[#421d0d]/8">
-        <form onSubmit={handleSubmit} className="p-5 sm:p-7">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-7">
           {/* Item name */}
           <div className="space-y-2">
             <div className="flex items-baseline justify-between gap-3">
@@ -306,7 +313,7 @@ const AddMenuItemPage = () => {
               {saved ? "Added to your registry." : ""}
             </p>
 
-            <div className="flex items-center gap-2 sm:justify-end">
+            <div className="flex w-full items-center gap-2 sm:w-auto sm:justify-end">
               <Button
                 type="button"
                 variant="outline"

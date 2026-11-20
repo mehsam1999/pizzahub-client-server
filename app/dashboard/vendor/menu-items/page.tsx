@@ -44,8 +44,8 @@ const PAGE_SIZE = 6
 export default function MyMenuItemsPage() {
   const [menus, setMenus] = useState<MenuItem[]>([])
   const [query, setQuery] = useState("")
-  const [category, setCategory] = useState("all")
-  const [status, setStatus] = useState("all")
+  const [category, setCategory] = useState("All")
+  const [status, setStatus] = useState("All")
   const [page, setPage] = useState(1)
 
   useEffect(() => {
@@ -61,8 +61,8 @@ export default function MyMenuItemsPage() {
 
         return (
           matchesQuery &&
-          (category === "all" || item.category === category) &&
-          (status === "all" || item.status === status)
+          (category === "All" || item.category === category) &&
+          (status === "All" || item.status === status)
         )
       }),
     [menus, query, category, status]
@@ -77,8 +77,8 @@ export default function MyMenuItemsPage() {
 
   return (
     <main className="min-h-screen bg-[#fff8f4] px-3 py-7 text-[#421d0d] sm:px-6 sm:py-9 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <p className="flex items-center gap-2 text-[10px] font-semibold tracking-[0.16em] text-[#8b5a24] uppercase">
+      <div className="mx-auto max-w-8xl">
+        <p className="flex items-center gap-2 text-[9px] font-semibold tracking-[0.12em] text-[#8b5a24] uppercase sm:text-[10px] sm:tracking-[0.16em]">
           <Utensils className="size-3.5" aria-hidden />
           Artisan Roster • Master Inventory
         </p>
@@ -121,12 +121,12 @@ export default function MyMenuItemsPage() {
           >
             <SelectTrigger
               aria-label="Filter by category"
-              className="h-10 w-full rounded-lg border-0 bg-[#fdf2e5] text-xs sm:w-40"
+              className="h-10 w-full rounded-lg border-0 bg-[#fdf2e5] text-xs sm:w-52"
             >
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="All">All Categories</SelectItem>
               {CATEGORIES.map((item) => (
                 <SelectItem key={item} value={item}>
                   {item}
@@ -151,7 +151,7 @@ export default function MyMenuItemsPage() {
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="All">All Statuses</SelectItem>
               <SelectItem value="Approved">Approved</SelectItem>
               <SelectItem value="Pending">Pending</SelectItem>
               <SelectItem value="Rejected">Rejected</SelectItem>
@@ -169,8 +169,9 @@ export default function MyMenuItemsPage() {
 
         <section
           aria-label="Menu items"
-          className="mt-4 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-[#421d0d]/5"
+          className="mt-4 rounded-xl bg-white shadow-sm ring-1 ring-[#421d0d]/5"
         >
+          <div className="overflow-x-auto rounded-t-xl">
           <Table className="min-w-[760px] table-fixed">
             <TableHeader className="bg-[#fff1e5]">
               <TableRow className="border-0 hover:bg-transparent">
@@ -282,8 +283,9 @@ export default function MyMenuItemsPage() {
               )}
             </TableBody>
           </Table>
+          </div>
 
-          <div className="flex flex-col gap-3 border-t border-[#421d0d]/5 px-4 py-3 text-[10px] text-[#78675d] sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 border-t border-[#421d0d]/5 px-3 py-3 text-[10px] text-[#78675d] sm:flex-row sm:items-center sm:justify-between sm:px-4">
             <span>
               Showing{" "}
               {filteredItems.length ? (currentPage - 1) * PAGE_SIZE + 1 : 0} to{" "}

@@ -10,6 +10,9 @@ export const createMenu = async (data: MenuItemForm) => {
     },
     body: JSON.stringify(data),
   })
+  if (!res.ok) {
+    throw new Error("Failed to create menu item")
+  }
   return res.json()
 }
 
