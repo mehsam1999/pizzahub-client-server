@@ -108,9 +108,9 @@ const menuItemsByRole = {
       icon: LayoutGrid,
     },
     {
-      id: "customer-orders",
+      id: "my-orders",
       name: "My Orders",
-      url: "/dashboard/customer/orders",
+      url: "/dashboard/customer/my-orders",
       icon: NotebookText,
     },
     {

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -7,8 +8,6 @@ import {
   ChevronRight,
   MapPin,
   Store,
-  Minus,
-  Plus,
   ShoppingBag,
   BadgeCheck,
 } from "lucide-react"
@@ -17,7 +16,10 @@ import type { MenuItem } from "@/lib/types/menu"
 import { getMenuItemVendorName } from "@/lib/types/menu"
 import { useSession } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
-import { proccedItemOrder } from "@/lib/actions/orders"
+import {
+  proccedItemOrder,
+  type OrderForm,
+} from "@/lib/actions/orders"
 import { toast } from "@/components/ui/toast"
 
 export function MenuDetailsView({ menu }: { menu: MenuItem }) {
@@ -25,10 +27,12 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
   const { data: session } = useSession()
   const user = session?.user
 
-  const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(menu.imageUrl)
   const [customerName, setCustomerName] = useState("")
+  const [deliveryDate, setDeliveryDate] = useState("")
   const [deliveryAddress, setDeliveryAddress] = useState("")
+  const [message, setMessage] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const galleryImages = [menu.imageUrl, ...(menu.images ?? [])].filter(
     (image, index, self) => image && self.indexOf(image) === index
@@ -37,49 +41,82 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
   const vendorName = getMenuItemVendorName(menu) || "PizzaHub Vendor"
 
   const price = Number(menu.price) || 0
-  const total = price * quantity
 
-  const handleMenuOrder = async() => {
+  const handleMenuOrder = async () => {
     if (!user) {
       router.push(`/sign-in?redirectTo=/browse-menus/${menu._id}`)
       return
     }
 
-    if (!customerName.trim() || !deliveryAddress.trim()) {
-      alert("Please provide your name and delivery address")
+    if (user.role !== "customer") {
+      toast.add({
+        title: "Order failed",
+        description: "Only customers can place orders.",
+        type: "error",
+      })
       return
     }
 
-    // Save order information
-    else if (user.role == "customer") {
-      const orders = {
-        userId: user.id,
-        email: user.email,
-        vendorInfo: vendorName,
-        menuId: menu._id,
-        itemName: menu.name,
-        imageUrl: menu.imageUrl,
-        customerName: customerName.trim(),
-        deliveryAddress: deliveryAddress.trim(),
-      }
-      const result = await proccedItemOrder(orders)
-      if(result.insertedId){
-        router.push('/browse-menus')
-        toast.add({
-        title: "Menu item added",
-        description: "Your menu item was added successfully.",
-        type: "success",
-      })
-
-      }
-    }
-    else{
+    if (
+      !customerName.trim() ||
+      !deliveryDate ||
+      !deliveryAddress.trim()
+    ) {
       toast.add({
-        title: "Menu item added",
-        description: "Your menu item was added successfully.",
+        title: "Missing information",
+        description: "Please fill in all required fields.",
         type: "error",
       })
+      return
+    }
 
+    const orders: OrderForm = {
+      userId: user.id,
+      email: user.email,
+      customerName: customerName.trim(),
+      menuId: String(menu._id),
+      itemName: menu.name,
+      imageUrl: menu.imageUrl,
+      itemCategory: menu.category,
+      vendorId: String(menu.vendorId),
+      vendorName,
+      deliveryDate,
+      deliveryAddress: deliveryAddress.trim(),
+      message: message.trim(),
+      status: "Pending",
+      createdAt: new Date().toISOString(),
+    }
+
+    try {
+      setIsSubmitting(true)
+
+      const result = await proccedItemOrder(orders)
+
+      if (result.insertedId) {
+        toast.add({
+          title: "Order placed",
+          description: "Your order has been submitted successfully.",
+          type: "success",
+        })
+
+        router.push("/dashboard/customer/my-orders")
+      } else {
+        toast.add({
+          title: "Order failed",
+          description: "Your order could not be placed. Please try again.",
+          type: "error",
+        })
+      }
+    } catch (error) {
+      console.error("Order submission failed:", error)
+
+      toast.add({
+        title: "Order failed",
+        description: "Something went wrong. Please try again.",
+        type: "error",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -104,7 +141,9 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
 
           <ChevronRight size={12} />
 
-          <span className="font-semibold text-[#421d0d]">{menu.name}</span>
+          <span className="font-semibold text-[#421d0d]">
+            {menu.name}
+          </span>
         </div>
       </div>
 
@@ -207,9 +246,13 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                     Menu Vendor
                   </p>
 
-                  <h3 className="truncate text-sm font-bold">{vendorName}</h3>
+                  <h3 className="truncate text-sm font-bold">
+                    {vendorName}
+                  </h3>
 
-                  <p className="text-[10px] text-[#78675d]">Menu provider</p>
+                  <p className="text-[10px] text-[#78675d]">
+                    Menu provider
+                  </p>
                 </div>
               </div>
 
@@ -242,13 +285,19 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
           {/* Category and Location */}
           <div className="mt-5 grid grid-cols-2 gap-2">
             <div className="rounded-lg bg-[#fbeadd] p-3">
-              <p className="text-[9px] font-medium text-[#806000]">CATEGORY</p>
+              <p className="text-[9px] font-medium text-[#806000]">
+                CATEGORY
+              </p>
               <p className="mt-1 text-xs font-bold">{menu.category}</p>
             </div>
 
             <div className="rounded-lg bg-[#fbeadd] p-3">
-              <p className="text-[9px] font-medium text-[#806000]">LOCATION</p>
-              <p className="mt-1 truncate text-xs font-bold">{menu.location}</p>
+              <p className="text-[9px] font-medium text-[#806000]">
+                LOCATION
+              </p>
+              <p className="mt-1 truncate text-xs font-bold">
+                {menu.location}
+              </p>
             </div>
           </div>
 
@@ -259,6 +308,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
 
               {/* Customer Information */}
               <div className="mb-4 space-y-3">
+                {/* Customer Name */}
                 <div>
                   <label className="mb-1 block text-xs font-semibold">
                     Customer Name
@@ -273,6 +323,22 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                   />
                 </div>
 
+                {/* Delivery Date */}
+                <div>
+                  <label className="mb-1 block text-xs font-semibold">
+                    Delivery Date
+                  </label>
+
+                  <input
+                    type="date"
+                    value={deliveryDate}
+                    min={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setDeliveryDate(e.target.value)}
+                    className="h-10 w-full rounded-lg border border-[#ead9cc] bg-white px-3 text-xs outline-none focus:border-[#806000]"
+                  />
+                </div>
+
+                {/* Delivery Address */}
                 <div>
                   <label className="mb-1 block text-xs font-semibold">
                     Delivery Address
@@ -286,51 +352,33 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                     className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-xs outline-none focus:border-[#806000]"
                   />
                 </div>
-              </div>
 
-              {/* Quantity */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-[#78675d]">Quantity</span>
+                {/* Additional Message */}
+                <div>
+                  <label className="mb-1 block text-xs font-semibold">
+                    Additional Message (Optional)
+                  </label>
 
-                <div className="flex h-9 items-center rounded-lg border border-[#ead9cc] bg-white">
-                  <button
-                    type="button"
-                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                    disabled={quantity <= 1}
-                    className="flex h-full w-9 items-center justify-center disabled:opacity-40"
-                  >
-                    <Minus size={13} />
-                  </button>
-
-                  <span className="w-7 text-center text-sm font-semibold tabular-nums">
-                    {quantity}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => setQuantity((prev) => prev + 1)}
-                    className="flex h-full w-9 items-center justify-center"
-                  >
-                    <Plus size={13} />
-                  </button>
+                  <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Any special instructions?"
+                    rows={2}
+                    className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-xs outline-none focus:border-[#806000]"
+                  />
                 </div>
               </div>
 
               {/* Price Details */}
-              <div className="mt-4 space-y-2 border-t border-[#ead9cc] pt-3">
+              <div className="space-y-2 border-t border-[#ead9cc] pt-3">
                 <div className="flex justify-between text-xs text-[#78675d]">
                   <span>Price per item</span>
                   <span>${price.toFixed(2)}</span>
                 </div>
 
-                <div className="flex justify-between text-xs text-[#78675d]">
-                  <span>Quantity</span>
-                  <span>× {quantity}</span>
-                </div>
-
                 <div className="flex justify-between border-t border-[#ead9cc] pt-3 text-sm font-bold">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>${price.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -338,10 +386,11 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
               <button
                 type="button"
                 onClick={handleMenuOrder}
-                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#ffcc42] px-3 text-center text-[11px] font-bold text-[#421d0d] transition-colors hover:bg-[#f4bb28]"
+                disabled={isSubmitting}
+                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#ffcc42] px-3 text-center text-[11px] font-bold text-[#421d0d] transition-colors hover:bg-[#f4bb28] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <ShoppingBag size={14} />
-                Proceed to Order
+                {isSubmitting ? "Placing Order..." : "Proceed to Order"}
               </button>
             </div>
           </div>
@@ -362,11 +411,15 @@ function InfoCard({
 }) {
   return (
     <div className="rounded-xl bg-[#fbeadd] p-3">
-      <p className="text-[9px] font-semibold text-[#806000]">{title}</p>
+      <p className="text-[9px] font-semibold text-[#806000]">
+        {title}
+      </p>
 
       <h3 className="mt-1 text-sm font-bold">{value}</h3>
 
-      <p className="mt-1 text-[9px] text-[#78675d]">{description}</p>
+      <p className="mt-1 text-[9px] text-[#78675d]">
+        {description}
+      </p>
     </div>
   )
 }
