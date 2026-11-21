@@ -1,8 +1,16 @@
+
 "use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ImageIcon, MapPin, Plus, Utensils, X } from "lucide-react"
+import {
+  ImageIcon,
+  MapPin,
+  Plus,
+  Utensils,
+  X,
+  Images,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -15,16 +23,23 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+
 import { createMenu } from "@/lib/actions/menu"
 import { toast } from "@/components/ui/toast"
+
 import {
   MenuItemFormField,
   menuItemFieldClass,
 } from "@/components/menu/menu-item-form-field"
+
 import { MENU_CATEGORIES } from "@/lib/constants/menu"
 import type { MenuItemForm } from "@/lib/types/menu"
 
-type MenuItemFormValues = Omit<MenuItemForm, "price"> & { price: string }
+type MenuItemFormValues = Omit<MenuItemForm, "price"> & {
+  price: string
+}
+
+const MAX_GALLERY_IMAGES = 3
 
 const EMPTY_FORM: MenuItemFormValues = {
   name: "",
@@ -33,49 +48,148 @@ const EMPTY_FORM: MenuItemFormValues = {
   description: "",
   location: "",
   imageUrl: "",
+  images: [],
   status: "Pending",
 }
+
 const AddMenuItemPage = () => {
   const router = useRouter()
+
   const [form, setForm] = useState<MenuItemFormValues>(EMPTY_FORM)
   const [saved, setSaved] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Update individual form fields
   const set =
     <K extends keyof MenuItemFormValues>(key: K) =>
-    (value: MenuItemFormValues[K]) =>
-      setForm((prev) => ({ ...prev, [key]: value }))
+    (value: MenuItemFormValues[K]) => {
+      setForm((prev) => ({
+        ...prev,
+        [key]: value,
+      }))
+    }
 
+  // Add a gallery image field
+  const addGalleryImage = () => {
+    if ((form.images?.length ?? 0) >= MAX_GALLERY_IMAGES) {
+      return
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      images: [...(prev.images ?? []), ""],
+    }))
+
+    setSaved(false)
+  }
+
+  // Update a gallery image URL
+  const updateGalleryImage = (index: number, value: string) => {
+    setForm((prev) => {
+      const images = [...(prev.images ?? [])]
+
+      images[index] = value
+
+      return {
+        ...prev,
+        images,
+      }
+    })
+
+    setSaved(false)
+  }
+
+  // Remove a gallery image
+  const removeGalleryImage = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      images: (prev.images ?? []).filter(
+        (_, imageIndex) => imageIndex !== index
+      ),
+    }))
+
+    setSaved(false)
+  }
+
+  // Reset form
+  const resetForm = () => {
+    setForm(EMPTY_FORM)
+    setSaved(false)
+  }
+
+  // Validate required fields
   const isFormInvalid =
     !form.name.trim() ||
     !form.category ||
     !form.price.trim() ||
+    Number(form.price) <= 0 ||
     !form.description.trim() ||
     !form.location.trim() ||
-    !form.imageUrl.trim()
+    !form.imageUrl.trim() ||
+    !Number.isFinite(Number(form.price))
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  // Submit form
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault()
 
-    const menuItemData: MenuItemForm = { ...form, price: Number(form.price) }
+    if (isFormInvalid || isSubmitting) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    const menuItemData: MenuItemForm = {
+      ...form,
+      name: form.name.trim(),
+      price: Number(form.price),
+      description: form.description.trim(),
+      location: form.location.trim(),
+      imageUrl: form.imageUrl.trim(),
+      images: (form.images ?? [])
+        .map((image) => image.trim())
+        .filter(Boolean),
+      status: "Pending",
+    }
 
     console.log("New menu item form data:", menuItemData)
 
     try {
       await createMenu(menuItemData)
+
       setForm(EMPTY_FORM)
       setSaved(true)
-      toast.add({ title: "Menu item added", description: "Your menu item was added successfully.", type: "success" })
+
+      toast.add({
+        title: "Menu item added",
+        description: "Your menu item was added successfully.",
+        type: "success",
+      })
+
       router.push("/dashboard/vendor/menu-items")
-    } catch {
-      toast.add({ title: "Could not add menu item", description: "Please try again.", type: "error" })
+    } catch (error) {
+      console.error("Create menu error:", error)
+
+      toast.add({
+        title: "Could not add menu item",
+        description: "Please try again.",
+        type: "error",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
     <div className="mx-auto w-full max-w-8xl px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
+
       {/* Eyebrow */}
       <p className="flex items-center gap-2 text-[9px] font-semibold tracking-[0.12em] text-[#421d0d] uppercase sm:text-[10px] sm:tracking-[0.2em]">
-        <Utensils className="size-3.5 text-[#c8815a]" aria-hidden />
+        <Utensils
+          className="size-3.5 text-[#c8815a]"
+          aria-hidden
+        />
         Culinary Registry &bull; Artisan Submission
       </p>
 
@@ -95,26 +209,33 @@ const AddMenuItemPage = () => {
       </div>
 
       <Card className="mt-7 gap-0! rounded-2xl bg-white py-0! shadow-[0_24px_60px_-48px_rgba(66,29,13,0.55)] ring-1 ring-[#421d0d]/8">
-        <form onSubmit={handleSubmit} className="p-4 sm:p-7">
-          {/* Item name */}
-          <div>
-            <MenuItemFormField id="item-name" label="Item Name">
-                <Input
-                  id="item-name"
-                  value={form.name}
-                  onChange={(event) => {
-                    set("name")(event.target.value)
-                    setSaved(false)
-                  }}
-                  placeholder="e.g. Burrata Pugliese & Prosciutto Crudo"
-                  className={menuItemFieldClass}
-                />
-            </MenuItemFormField>
-          </div>
 
-          {/* Category + price */}
+        <form onSubmit={handleSubmit} className="p-4 sm:p-7">
+
+          {/* Item Name */}
+          <MenuItemFormField
+            id="item-name"
+            label="Item Name"
+          >
+            <Input
+              id="item-name"
+              value={form.name}
+              onChange={(event) => {
+                set("name")(event.target.value)
+                setSaved(false)
+              }}
+              placeholder="e.g. Burrata Pugliese & Prosciutto Crudo"
+              className={menuItemFieldClass}
+            />
+          </MenuItemFormField>
+
+          {/* Category + Price */}
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            <MenuItemFormField id="item-category" label="Category">
+
+            <MenuItemFormField
+              id="item-category"
+              label="Category"
+            >
               <Select
                 value={form.category}
                 onValueChange={(value) => {
@@ -133,7 +254,10 @@ const AddMenuItemPage = () => {
 
                 <SelectContent>
                   {MENU_CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>
+                    <SelectItem
+                      key={category}
+                      value={category}
+                    >
                       {category}
                     </SelectItem>
                   ))}
@@ -141,7 +265,10 @@ const AddMenuItemPage = () => {
               </Select>
             </MenuItemFormField>
 
-            <MenuItemFormField id="item-price" label="Price">
+            <MenuItemFormField
+              id="item-price"
+              label="Price"
+            >
               <div className="relative">
                 <span
                   aria-hidden
@@ -153,7 +280,7 @@ const AddMenuItemPage = () => {
                 <Input
                   id="item-price"
                   type="number"
-                  min="0"
+                  min="0.01"
                   step="0.01"
                   inputMode="decimal"
                   value={form.price}
@@ -166,6 +293,7 @@ const AddMenuItemPage = () => {
                 />
               </div>
             </MenuItemFormField>
+
           </div>
 
           {/* Description */}
@@ -218,10 +346,10 @@ const AddMenuItemPage = () => {
             </div>
           </MenuItemFormField>
 
-          {/* Image URL */}
+          {/* Main Image URL */}
           <MenuItemFormField
             id="item-image"
-            label="Item Image URL"
+            label="Main Image URL"
             className="mt-6"
           >
             <div className="relative">
@@ -238,19 +366,24 @@ const AddMenuItemPage = () => {
                   set("imageUrl")(event.target.value)
                   setSaved(false)
                 }}
-                placeholder="https://example.com/my-dish.jpg"
+                placeholder="https://example.com/main-dish.jpg"
                 className={`${menuItemFieldClass} pl-10`}
               />
             </div>
 
-            {form.imageUrl.trim() !== "" ? (
+            {form.imageUrl.trim() ? (
               <div className="mt-3 overflow-hidden rounded-lg bg-[#fdf2e5] ring-1 ring-[#421d0d]/8">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={form.imageUrl}
-                  alt="Menu item preview"
+                  alt="Main menu item preview"
                   className="h-40 w-full object-cover"
                 />
+
+                <div className="bg-[#fbeadd] px-3 py-2">
+                  <p className="text-[10px] font-semibold text-[#421d0d]">
+                    Main Image
+                  </p>
+                </div>
               </div>
             ) : (
               <p className="text-[11px] text-[#6b5a4e]">
@@ -259,8 +392,113 @@ const AddMenuItemPage = () => {
             )}
           </MenuItemFormField>
 
+          {/* Gallery Images */}
+          <div className="mt-7">
+
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Images className="size-4 text-[#806000]" />
+
+                  <h3 className="text-sm font-semibold text-[#421d0d]">
+                    Gallery Images
+                  </h3>
+                </div>
+
+                <p className="mt-1 text-[11px] text-[#6b5a4e]">
+                  Add up to 3 additional images for your menu item.
+                </p>
+              </div>
+
+              <span className="shrink-0 rounded-full bg-[#fbeadd] px-3 py-1 text-[10px] font-semibold text-[#806000]">
+                {form.images?.length ?? 0} / {MAX_GALLERY_IMAGES}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+
+              {(form.images ?? []).map((image, index) => (
+                <div
+                  key={index}
+                  className="rounded-xl border border-[#421d0d]/10 bg-[#fffdfa] p-3"
+                >
+
+                  <div className="flex items-center gap-2">
+
+                    <div className="min-w-0 flex-1">
+                      <label
+                        htmlFor={`gallery-image-${index}`}
+                        className="mb-1.5 block text-[10px] font-semibold text-[#6b5a4e]"
+                      >
+                        Gallery Image {index + 1}
+                      </label>
+
+                      <Input
+                        id={`gallery-image-${index}`}
+                        type="url"
+                        value={image}
+                        onChange={(event) =>
+                          updateGalleryImage(index, event.target.value)
+                        }
+                        placeholder="https://example.com/gallery-image.jpg"
+                        className={menuItemFieldClass}
+                      />
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      aria-label={`Remove gallery image ${index + 1}`}
+                      onClick={() => removeGalleryImage(index)}
+                      className="mt-5 size-10 shrink-0 border-red-200 text-red-500 hover:bg-red-50 hover:text-red-600"
+                    >
+                      <X size={16} />
+                    </Button>
+
+                  </div>
+
+                  {image.trim() && (
+                    <div className="mt-3 overflow-hidden rounded-lg bg-[#fdf2e5] ring-1 ring-[#421d0d]/8">
+                      <img
+                        src={image}
+                        alt={`Gallery image preview ${index + 1}`}
+                        className="h-32 w-full object-cover"
+                      />
+
+                      <p className="bg-[#fbeadd] px-3 py-2 text-[10px] font-medium text-[#421d0d]">
+                        Gallery Image {index + 1}
+                      </p>
+                    </div>
+                  )}
+
+                </div>
+              ))}
+
+            </div>
+
+            {/* Add Gallery Image Button */}
+            {(form.images?.length ?? 0) < MAX_GALLERY_IMAGES && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addGalleryImage}
+                className="mt-3 h-11 w-full rounded-lg border-dashed border-[#421d0d]/25 bg-white text-xs font-semibold text-[#421d0d] hover:bg-[#fdf2e5]"
+              >
+                <Plus size={16} />
+                Add Gallery Image
+              </Button>
+            )}
+
+            <p className="mt-2 text-[10px] text-[#6b5a4e]">
+              Main image is required. Gallery images are optional.
+            </p>
+
+          </div>
+
           {/* Actions */}
           <div className="mt-7 flex flex-col-reverse items-stretch gap-3 border-t border-[#421d0d]/8 pt-5 sm:flex-row sm:items-center sm:justify-between">
+
             <p
               role="status"
               className="text-[12px] text-[#6b5a4e] sm:text-left"
@@ -269,13 +507,12 @@ const AddMenuItemPage = () => {
             </p>
 
             <div className="flex w-full items-center gap-2 sm:w-auto sm:justify-end">
+
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => {
-                  setForm(EMPTY_FORM)
-                  setSaved(false)
-                }}
+                disabled={isSubmitting}
+                onClick={resetForm}
                 className="h-10 flex-1 rounded-lg border-[#421d0d]/15 bg-white px-5 text-[#421d0d] hover:bg-[#fdf2e5] sm:flex-none"
               >
                 <X aria-hidden />
@@ -284,14 +521,16 @@ const AddMenuItemPage = () => {
 
               <Button
                 type="submit"
-                disabled={isFormInvalid}
+                disabled={isFormInvalid || isSubmitting}
                 className="h-10 flex-1 rounded-lg bg-[#421d0d] px-5 font-semibold text-[#fdf6e3] hover:bg-[#2f1a0d] sm:flex-none"
               >
                 <Plus aria-hidden />
-                Add Menu Item
+                {isSubmitting ? "Adding Menu..." : "Add Menu Item"}
               </Button>
+
             </div>
           </div>
+
         </form>
       </Card>
     </div>

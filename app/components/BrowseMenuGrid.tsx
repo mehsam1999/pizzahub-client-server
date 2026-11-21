@@ -3,6 +3,7 @@
 
 import { AnimatePresence, motion } from "motion/react"
 import { MapPin, Store, Search } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import {
   getMenuItemVendorName,
@@ -67,7 +68,12 @@ function MenuCard({
   menu: MenuItem
   index: number
 }) {
+  const router = useRouter()
   const vendorName = getMenuItemVendorName(menu)
+
+  const handleViewDetails = () => {
+    router.push(`/browse-menus/${menu._id}`)
+  }
 
   return (
     <motion.article
@@ -133,6 +139,7 @@ function MenuCard({
 
         <button
           type="button"
+          onClick={handleViewDetails}
           className="mt-3 h-8 w-full rounded-md bg-[#ffcc42] text-[10px] font-semibold text-[#421d0d] transition-colors hover:bg-[#f4bb28]"
         >
           View Details →

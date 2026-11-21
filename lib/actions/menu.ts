@@ -18,9 +18,12 @@ export const createMenu = async (data: MenuItemForm) => {
     throw new Error("Only authenticated vendors can add menu items")
   }
 
-  // Automatically get vendor information from the session
   const menu = {
     ...data,
+    imageUrl: data.imageUrl.trim(),
+    images: (data.images ?? []).filter(
+      (image) => typeof image === "string" && image.trim() !== ""
+    ).map((image) => image.trim()),
     vendorId: session.user.id,
     vendorName: session.user.name?.trim() || session.user.email,
     status: "Pending" as const,

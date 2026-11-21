@@ -1,0 +1,319 @@
+
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import {
+  Home,
+  ChevronRight,
+  MapPin,
+  Store,
+  Minus,
+  Plus,
+  ShoppingBag,
+  BadgeCheck,
+} from "lucide-react"
+
+import type { MenuItem } from "@/lib/types/menu"
+import { getMenuItemVendorName } from "@/lib/types/menu"
+
+export function MenuDetailsView({
+  menu,
+}: {
+  menu: MenuItem
+}) {
+  const [quantity, setQuantity] = useState(1)
+  const [selectedImage, setSelectedImage] = useState(menu.imageUrl)
+
+  const galleryImages = [
+    menu.imageUrl,
+    ...(menu.images ?? []),
+  ].filter((image, index, self) => image && self.indexOf(image) === index)
+
+  const vendorName =
+    getMenuItemVendorName(menu) || "PizzaHub Vendor"
+
+  const price = Number(menu.price) || 0
+  const total = price * quantity
+
+  return (
+    <main className="min-h-screen bg-[#fff8f4] text-[#421d0d]">
+
+      {/* Breadcrumb */}
+      <div className="border-b border-[#ead9cc] bg-[#fff0e4] px-5 py-3">
+        <div className="mx-auto flex max-w-7xl items-center gap-2 text-[11px] text-[#78675d]">
+          <Link href="/" className="flex items-center gap-1 hover:text-[#421d0d]">
+            <Home size={12} />
+            Home
+          </Link>
+
+          <ChevronRight size={12} />
+
+          <Link href="/browse-menus" className="hover:text-[#421d0d]">
+            Browse Menu
+          </Link>
+
+          <ChevronRight size={12} />
+
+          <span className="font-semibold text-[#421d0d]">
+            {menu.name}
+          </span>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-7 px-4 py-8 sm:px-6 lg:grid-cols-[1.35fr_0.95fr] lg:gap-8 lg:py-12">
+
+        {/* Left Side */}
+        <section>
+
+          {/* Main Image */}
+          <div className="relative aspect-[1.45] overflow-hidden rounded-xl bg-[#f5e6da] shadow-sm">
+            <img
+              src={selectedImage || menu.imageUrl}
+              alt={menu.name}
+              className="h-full w-full object-cover"
+            />
+
+            <div className="absolute top-3 left-3">
+              <span className="rounded-full bg-[#421d0d]/85 px-3 py-1.5 text-[10px] font-medium text-white">
+                {menu.category}
+              </span>
+            </div>
+          </div>
+
+          {/* Image Gallery */}
+          <div className="mt-3 grid grid-cols-4 gap-2">
+            {galleryImages.map((image, index) => (
+              <button
+                key={`${image}-${index}`}
+                type="button"
+                onClick={() => setSelectedImage(image)}
+                className={`aspect-[1.35] overflow-hidden rounded-lg border-2 ${
+                  selectedImage === image
+                    ? "border-[#421d0d]"
+                    : "border-transparent opacity-70 hover:opacity-100"
+                }`}
+              >
+                <img
+                  src={image}
+                  alt={`${menu.name} preview ${index + 1}`}
+                  className="h-full w-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+
+          {/* Information Cards */}
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <InfoCard
+              title="Menu Category"
+              value={menu.category}
+              description="PizzaHub menu selection"
+            />
+
+            <InfoCard
+              title="Price"
+              value={`$${price.toFixed(2)}`}
+              description="Per item"
+            />
+
+            <InfoCard
+              title="Availability"
+              value="Available Item"
+              description="Available to order"
+            />
+          </div>
+        </section>
+
+        {/* Right Side */}
+        <section className="flex flex-col">
+
+          {/* Title and Price */}
+          <div>
+            <span className="rounded-full bg-[#f5e6da] px-2.5 py-1 text-[9px] font-medium">
+              {menu.category}
+            </span>
+
+            <h1 className="mt-2 font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+              {menu.name}
+            </h1>
+
+            <div className="mt-2 flex items-center gap-2">
+              <span className="font-serif text-xl font-bold">
+                ${price.toFixed(2)}
+              </span>
+
+              <span className="text-[10px] text-[#78675d]">
+                Per item • Prepared to order
+              </span>
+            </div>
+          </div>
+
+          {/* Vendor Card */}
+          <div className="mt-5 rounded-xl bg-[#fbeadd] p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white">
+                  <Store size={20} className="text-[#806000]" />
+                </div>
+
+                <div className="min-w-0">
+                  <p className="text-[9px] font-semibold uppercase tracking-wider text-[#806000]">
+                    Menu Vendor
+                  </p>
+
+                  <h3 className="truncate text-sm font-bold">
+                    {vendorName}
+                  </h3>
+
+                  <p className="text-[10px] text-[#78675d]">
+                    Menu provider
+                  </p>
+                </div>
+              </div>
+
+              <span className="shrink-0 rounded-md bg-white px-3 py-2 text-[9px] font-semibold flex items-center gap-1">
+                <BadgeCheck size={13}></BadgeCheck>Verified Menu
+              </span>
+            </div>
+
+            <div className="mt-3 rounded-lg bg-white/70 p-2.5">
+              <p className="flex items-center gap-2 text-[10px] text-[#78675d]">
+                <MapPin size={13} className="shrink-0 text-[#806000]" />
+                {menu.location}
+              </p>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="mt-6">
+            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#6b5143]">
+              About This Menu
+            </h3>
+
+            <p className="mt-2 text-xs leading-[1.9] text-[#59483e]">
+              {menu.description || "No description available for this menu item."}
+            </p>
+          </div>
+
+          {/* Category and Location */}
+          <div className="mt-5 grid grid-cols-2 gap-2">
+            <div className="rounded-lg bg-[#fbeadd] p-3">
+              <p className="text-[9px] font-medium text-[#806000]">
+                CATEGORY
+              </p>
+              <p className="mt-1 text-xs font-bold">
+                {menu.category}
+              </p>
+            </div>
+
+            <div className="rounded-lg bg-[#fbeadd] p-3">
+              <p className="text-[9px] font-medium text-[#806000]">
+                LOCATION
+              </p>
+              <p className="mt-1 truncate text-xs font-bold">
+                {menu.location}
+              </p>
+            </div>
+          </div>
+
+          {/* Order Summary */}
+          <div className="mt-auto pt-6">
+            <div className="rounded-xl bg-[#fff0e4] p-4">
+
+              <p className="mb-3 text-sm font-bold">
+                Order Summary
+              </p>
+
+              {/* Quantity */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[#78675d]">
+                  Quantity
+                </span>
+
+                <div className="flex h-9 items-center rounded-lg border border-[#ead9cc] bg-white">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                    disabled={quantity <= 1}
+                    className="flex h-full w-9 items-center justify-center disabled:opacity-40"
+                  >
+                    <Minus size={13} />
+                  </button>
+
+                  <span className="w-7 text-center text-sm font-semibold tabular-nums">
+                    {quantity}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((prev) => prev + 1)}
+                    className="flex h-full w-9 items-center justify-center"
+                  >
+                    <Plus size={13} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Price Details */}
+              <div className="mt-4 space-y-2 border-t border-[#ead9cc] pt-3">
+                <div className="flex justify-between text-xs text-[#78675d]">
+                  <span>Price per item</span>
+                  <span>${price.toFixed(2)}</span>
+                </div>
+
+                <div className="flex justify-between text-xs text-[#78675d]">
+                  <span>Quantity</span>
+                  <span>× {quantity}</span>
+                </div>
+
+                <div className="flex justify-between border-t border-[#ead9cc] pt-3 text-sm font-bold">
+                  <span>Total</span>
+                  <span>${total.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Proceed to Order */}
+              <Link
+                href="/sign-in"
+                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#ffcc42] px-3 text-center text-[11px] font-bold text-[#421d0d] transition-colors hover:bg-[#f4bb28]"
+              >
+                <ShoppingBag size={14} />
+                Proceed to Order
+              </Link>
+
+            </div>
+          </div>
+
+        </section>
+      </div>
+    </main>
+  )
+}
+
+function InfoCard({
+  title,
+  value,
+  description,
+}: {
+  title: string
+  value: string
+  description: string
+}) {
+  return (
+    <div className="rounded-xl bg-[#fbeadd] p-3">
+      <p className="text-[9px] font-semibold text-[#806000]">
+        {title}
+      </p>
+
+      <h3 className="mt-1 text-sm font-bold">
+        {value}
+      </h3>
+
+      <p className="mt-1 text-[9px] text-[#78675d]">
+        {description}
+      </p>
+    </div>
+  )
+}

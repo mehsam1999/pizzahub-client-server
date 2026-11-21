@@ -7,6 +7,7 @@ export type MenuItemForm = {
   description: string
   location: string
   imageUrl: string
+  images?: string[]
   status: MenuStatus
 }
 
