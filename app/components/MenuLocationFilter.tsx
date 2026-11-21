@@ -13,16 +13,25 @@ import { ALL_LOCATIONS } from "@/lib/constants/menu"
 
 export function MenuLocationFilter({
   locations,
+  value,
   onChange,
 }: {
   locations: string[]
-  onChange?: (value: string) => void
+  value: string
+  onChange: (value: string) => void
 }) {
+  const items = [
+    { value: ALL_LOCATIONS, label: "All Locations" },
+    ...locations.map((location) => ({ value: location, label: location })),
+  ]
+
   return (
     <Select
-      onValueChange={(value) => {
-        if (typeof value === "string") {
-          onChange?.(value)
+      items={items}
+      value={value}
+      onValueChange={(next) => {
+        if (typeof next === "string") {
+          onChange(next)
         }
       }}
     >
@@ -34,10 +43,9 @@ export function MenuLocationFilter({
         <SelectValue placeholder="All Locations" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value={ALL_LOCATIONS}>All Locations</SelectItem>
-        {locations.map((location) => (
-          <SelectItem key={location} value={location}>
-            {location}
+        {items.map((item) => (
+          <SelectItem key={item.value} value={item.value}>
+            {item.label}
           </SelectItem>
         ))}
       </SelectContent>

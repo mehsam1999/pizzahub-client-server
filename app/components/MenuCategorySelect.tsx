@@ -11,16 +11,28 @@ import {
 } from "@/components/ui/select"
 import { ALL_CATEGORIES, MENU_CATEGORIES } from "@/lib/constants/menu"
 
+const CATEGORY_ITEMS = [
+  { value: ALL_CATEGORIES, label: "All Categories" },
+  ...MENU_CATEGORIES.map((category) => ({
+    value: category,
+    label: category,
+  })),
+]
+
 export function MenuCategorySelect({
+  value,
   onChange,
 }: {
-  onChange?: (value: string) => void
+  value: string
+  onChange: (value: string) => void
 }) {
   return (
     <Select
-      onValueChange={(value) => {
-        if (typeof value === "string") {
-          onChange?.(value)
+      items={CATEGORY_ITEMS}
+      value={value}
+      onValueChange={(next) => {
+        if (typeof next === "string") {
+          onChange(next)
         }
       }}
     >
@@ -32,10 +44,9 @@ export function MenuCategorySelect({
         <SelectValue placeholder="All Categories" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value={ALL_CATEGORIES}>All Categories</SelectItem>
-        {MENU_CATEGORIES.map((category) => (
-          <SelectItem key={category} value={category}>
-            {category}
+        {CATEGORY_ITEMS.map((item) => (
+          <SelectItem key={item.value} value={item.value}>
+            {item.label}
           </SelectItem>
         ))}
       </SelectContent>

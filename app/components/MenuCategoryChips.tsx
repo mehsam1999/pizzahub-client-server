@@ -3,29 +3,52 @@
 import { ALL_CATEGORIES, MENU_CATEGORIES } from "@/lib/constants/menu"
 
 export function MenuCategoryChips({
+  value,
   onChange,
 }: {
-  onChange?: (value: string) => void
+  value: string
+  onChange: (value: string) => void
 }) {
   return (
-    <div className="mt-2 flex gap-1.5 overflow-x-auto pb-0.5">
-      <button
-        type="button"
-        onClick={() => onChange?.(ALL_CATEGORIES)}
-        className="shrink-0 rounded-full bg-[#421d0d] px-2.5 py-1 text-[9px] font-medium text-white"
-      >
-        All Pizzas
-      </button>
+    <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto pb-0.5">
+      <CategoryChip
+        label="All Pizzas"
+        active={value === ALL_CATEGORIES}
+        onClick={() => onChange(ALL_CATEGORIES)}
+      />
       {MENU_CATEGORIES.map((category) => (
-        <button
+        <CategoryChip
           key={category}
-          type="button"
-          onClick={() => onChange?.(category)}
-          className="shrink-0 rounded-full bg-[#fdf2e5] px-2.5 py-1 text-[9px] font-medium text-[#421d0d] transition-colors hover:bg-[#f7e4d2]"
-        >
-          {category}
-        </button>
+          label={category}
+          active={value === category}
+          onClick={() => onChange(category)}
+        />
       ))}
     </div>
+  )
+}
+
+function CategoryChip({
+  label,
+  active,
+  onClick,
+}: {
+  label: string
+  active: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`shrink-0 rounded-full px-2.5 py-1 text-[9px] font-medium transition-colors ${
+        active
+          ? "bg-[#421d0d] text-white"
+          : "bg-[#fdf2e5] text-[#421d0d] hover:bg-[#f7e4d2]"
+      }`}
+    >
+      {label}
+    </button>
   )
 }

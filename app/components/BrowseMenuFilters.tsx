@@ -1,30 +1,55 @@
 "use client"
 
+import { X } from "lucide-react"
+
 import { MenuCategoryChips } from "./MenuCategoryChips"
-import { MenuCategorySelect } from "./MenuCategorySelect"
 import { MenuLocationFilter } from "./MenuLocationFilter"
 import { MenuPriceSort } from "./MenuPriceSort"
 import { MenuSearchFilter } from "./MenuSearchFilter"
+import { useMenuFilters } from "./use-menu-filters"
 
 export function BrowseMenuFilters({ locations }: { locations: string[] }) {
-  
-  const handleSearchChange = () => {}
-  const handleLocationChange = () => {}
-  const handleCategoryChange = () => {}
-  const handlePriceSortChange = () => {}
+  const {
+    search,
+    category,
+    location,
+    sort,
+    hasActiveFilters,
+    setSearch,
+    setCategory,
+    setLocation,
+    setSort,
+    clearFilters,
+  } = useMenuFilters()
 
   return (
     <div className="mt-5 rounded-xl bg-white/80 p-2.5 shadow-sm ring-1 ring-[#421d0d]/5">
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.4fr)_minmax(0,0.4fr)_minmax(0,0.45fr)]">
-        <MenuSearchFilter onChange={handleSearchChange} />
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.4fr)_minmax(0,0.45fr)]">
+        <MenuSearchFilter value={search} onChange={setSearch} />
+
         <MenuLocationFilter
           locations={locations}
-          onChange={handleLocationChange}
+          value={location}
+          onChange={setLocation}
         />
-        <MenuCategorySelect onChange={handleCategoryChange} />
-        <MenuPriceSort onChange={handlePriceSortChange} />
+
+        <MenuPriceSort value={sort} onChange={setSort} />
       </div>
-      <MenuCategoryChips onChange={handleCategoryChange} />
+
+      <div className="mt-2 flex items-center gap-2">
+        <MenuCategoryChips value={category} onChange={setCategory} />
+
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md bg-[#fdf2e5] px-3 text-[10px] font-medium text-[#421d0d] transition-colors hover:bg-[#f7e4d2]"
+          >
+            <X className="size-3.5" />
+            Clear Filters
+          </button>
+        )}
+      </div>
     </div>
   )
 }

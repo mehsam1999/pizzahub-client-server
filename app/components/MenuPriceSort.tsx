@@ -12,15 +12,19 @@ import {
 import { PRICE_SORT_OPTIONS } from "@/lib/constants/menu"
 
 export function MenuPriceSort({
+  value,
   onChange,
 }: {
-  onChange?: (value: string) => void
+  value: string
+  onChange: (value: string) => void
 }) {
   return (
     <Select
-      onValueChange={(value) => {
-        if (typeof value === "string") {
-          onChange?.(value)
+      items={PRICE_SORT_OPTIONS}
+      value={value || null}
+      onValueChange={(next) => {
+        if (typeof next === "string") {
+          onChange(next)
         }
       }}
     >
