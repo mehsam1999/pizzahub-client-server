@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { Check, Eye, EyeOff } from "lucide-react"
 
@@ -43,6 +43,8 @@ const googleButtonClass =
   "flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-[#e2d2bf] bg-white text-sm font-semibold text-[#3d2010] transition-colors hover:bg-[#fdfaf6] focus-visible:ring-2 focus-visible:ring-[#f6c445]/60 focus-visible:outline-none"
 
 const SignInPage = () => {
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get("redirectTo")
   const pathname = usePathname()
   const router = useRouter()
 
@@ -91,7 +93,7 @@ const SignInPage = () => {
         email: values.email,
         password: values.password,
         rememberMe: values.remember,
-        callbackURL: "/",
+        callbackURL: redirectTo ??"/",
       })
 
       if (error) {

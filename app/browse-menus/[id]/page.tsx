@@ -13,8 +13,6 @@ const MenuDetailsPage = async ({
 
   const menu = await getMenusById(id)
 
-  
-
   if (!menu ) {
     notFound()
   }

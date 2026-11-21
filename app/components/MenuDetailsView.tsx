@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react"
@@ -16,33 +15,83 @@ import {
 
 import type { MenuItem } from "@/lib/types/menu"
 import { getMenuItemVendorName } from "@/lib/types/menu"
+import { useSession } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
+import { proccedItemOrder } from "@/lib/actions/orders"
+import { toast } from "@/components/ui/toast"
 
-export function MenuDetailsView({
-  menu,
-}: {
-  menu: MenuItem
-}) {
+export function MenuDetailsView({ menu }: { menu: MenuItem }) {
+  const router = useRouter()
+  const { data: session } = useSession()
+  const user = session?.user
+
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(menu.imageUrl)
+  const [customerName, setCustomerName] = useState("")
+  const [deliveryAddress, setDeliveryAddress] = useState("")
 
-  const galleryImages = [
-    menu.imageUrl,
-    ...(menu.images ?? []),
-  ].filter((image, index, self) => image && self.indexOf(image) === index)
+  const galleryImages = [menu.imageUrl, ...(menu.images ?? [])].filter(
+    (image, index, self) => image && self.indexOf(image) === index
+  )
 
-  const vendorName =
-    getMenuItemVendorName(menu) || "PizzaHub Vendor"
+  const vendorName = getMenuItemVendorName(menu) || "PizzaHub Vendor"
 
   const price = Number(menu.price) || 0
   const total = price * quantity
 
+  const handleMenuOrder = async() => {
+    if (!user) {
+      router.push(`/sign-in?redirectTo=/browse-menus/${menu._id}`)
+      return
+    }
+
+    if (!customerName.trim() || !deliveryAddress.trim()) {
+      alert("Please provide your name and delivery address")
+      return
+    }
+
+    // Save order information
+    else if (user.role == "customer") {
+      const orders = {
+        userId: user.id,
+        email: user.email,
+        vendorInfo: vendorName,
+        menuId: menu._id,
+        itemName: menu.name,
+        imageUrl: menu.imageUrl,
+        customerName: customerName.trim(),
+        deliveryAddress: deliveryAddress.trim(),
+      }
+      const result = await proccedItemOrder(orders)
+      if(result.insertedId){
+        router.push('/browse-menus')
+        toast.add({
+        title: "Menu item added",
+        description: "Your menu item was added successfully.",
+        type: "success",
+      })
+
+      }
+    }
+    else{
+      toast.add({
+        title: "Menu item added",
+        description: "Your menu item was added successfully.",
+        type: "error",
+      })
+
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#fff8f4] text-[#421d0d]">
-
       {/* Breadcrumb */}
       <div className="border-b border-[#ead9cc] bg-[#fff0e4] px-5 py-3">
         <div className="mx-auto flex max-w-7xl items-center gap-2 text-[11px] text-[#78675d]">
-          <Link href="/" className="flex items-center gap-1 hover:text-[#421d0d]">
+          <Link
+            href="/"
+            className="flex items-center gap-1 hover:text-[#421d0d]"
+          >
             <Home size={12} />
             Home
           </Link>
@@ -55,18 +104,14 @@ export function MenuDetailsView({
 
           <ChevronRight size={12} />
 
-          <span className="font-semibold text-[#421d0d]">
-            {menu.name}
-          </span>
+          <span className="font-semibold text-[#421d0d]">{menu.name}</span>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-7 px-4 py-8 sm:px-6 lg:grid-cols-[1.35fr_0.95fr] lg:gap-8 lg:py-12">
-
         {/* Left Side */}
         <section>
-
           {/* Main Image */}
           <div className="relative aspect-[1.45] overflow-hidden rounded-xl bg-[#f5e6da] shadow-sm">
             <img
@@ -128,14 +173,13 @@ export function MenuDetailsView({
 
         {/* Right Side */}
         <section className="flex flex-col">
-
           {/* Title and Price */}
           <div>
             <span className="rounded-full bg-[#f5e6da] px-2.5 py-1 text-[9px] font-medium">
               {menu.category}
             </span>
 
-            <h1 className="mt-2 font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+            <h1 className="mt-2 font-serif text-3xl leading-tight font-bold tracking-tight sm:text-4xl">
               {menu.name}
             </h1>
 
@@ -159,22 +203,19 @@ export function MenuDetailsView({
                 </div>
 
                 <div className="min-w-0">
-                  <p className="text-[9px] font-semibold uppercase tracking-wider text-[#806000]">
+                  <p className="text-[9px] font-semibold tracking-wider text-[#806000] uppercase">
                     Menu Vendor
                   </p>
 
-                  <h3 className="truncate text-sm font-bold">
-                    {vendorName}
-                  </h3>
+                  <h3 className="truncate text-sm font-bold">{vendorName}</h3>
 
-                  <p className="text-[10px] text-[#78675d]">
-                    Menu provider
-                  </p>
+                  <p className="text-[10px] text-[#78675d]">Menu provider</p>
                 </div>
               </div>
 
-              <span className="shrink-0 rounded-md bg-white px-3 py-2 text-[9px] font-semibold flex items-center gap-1">
-                <BadgeCheck size={13}></BadgeCheck>Verified Menu
+              <span className="flex shrink-0 items-center gap-1 rounded-md bg-white px-3 py-2 text-[9px] font-semibold">
+                <BadgeCheck size={13} />
+                Verified Menu
               </span>
             </div>
 
@@ -188,49 +229,68 @@ export function MenuDetailsView({
 
           {/* Description */}
           <div className="mt-6">
-            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#6b5143]">
+            <h3 className="text-[11px] font-semibold tracking-wider text-[#6b5143] uppercase">
               About This Menu
             </h3>
 
             <p className="mt-2 text-xs leading-[1.9] text-[#59483e]">
-              {menu.description || "No description available for this menu item."}
+              {menu.description ||
+                "No description available for this menu item."}
             </p>
           </div>
 
           {/* Category and Location */}
           <div className="mt-5 grid grid-cols-2 gap-2">
             <div className="rounded-lg bg-[#fbeadd] p-3">
-              <p className="text-[9px] font-medium text-[#806000]">
-                CATEGORY
-              </p>
-              <p className="mt-1 text-xs font-bold">
-                {menu.category}
-              </p>
+              <p className="text-[9px] font-medium text-[#806000]">CATEGORY</p>
+              <p className="mt-1 text-xs font-bold">{menu.category}</p>
             </div>
 
             <div className="rounded-lg bg-[#fbeadd] p-3">
-              <p className="text-[9px] font-medium text-[#806000]">
-                LOCATION
-              </p>
-              <p className="mt-1 truncate text-xs font-bold">
-                {menu.location}
-              </p>
+              <p className="text-[9px] font-medium text-[#806000]">LOCATION</p>
+              <p className="mt-1 truncate text-xs font-bold">{menu.location}</p>
             </div>
           </div>
 
           {/* Order Summary */}
           <div className="mt-auto pt-6">
             <div className="rounded-xl bg-[#fff0e4] p-4">
+              <p className="mb-3 text-sm font-bold">Order Summary</p>
 
-              <p className="mb-3 text-sm font-bold">
-                Order Summary
-              </p>
+              {/* Customer Information */}
+              <div className="mb-4 space-y-3">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold">
+                    Customer Name
+                  </label>
+
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Enter your full name"
+                    className="h-10 w-full rounded-lg border border-[#ead9cc] bg-white px-3 text-xs outline-none focus:border-[#806000]"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-semibold">
+                    Delivery Address
+                  </label>
+
+                  <textarea
+                    value={deliveryAddress}
+                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                    placeholder="Enter your delivery address"
+                    rows={3}
+                    className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-xs outline-none focus:border-[#806000]"
+                  />
+                </div>
+              </div>
 
               {/* Quantity */}
               <div className="flex items-center justify-between">
-                <span className="text-xs text-[#78675d]">
-                  Quantity
-                </span>
+                <span className="text-xs text-[#78675d]">Quantity</span>
 
                 <div className="flex h-9 items-center rounded-lg border border-[#ead9cc] bg-white">
                   <button
@@ -275,17 +335,16 @@ export function MenuDetailsView({
               </div>
 
               {/* Proceed to Order */}
-              <Link
-                href="/sign-in"
+              <button
+                type="button"
+                onClick={handleMenuOrder}
                 className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#ffcc42] px-3 text-center text-[11px] font-bold text-[#421d0d] transition-colors hover:bg-[#f4bb28]"
               >
                 <ShoppingBag size={14} />
                 Proceed to Order
-              </Link>
-
+              </button>
             </div>
           </div>
-
         </section>
       </div>
     </main>
@@ -303,17 +362,11 @@ function InfoCard({
 }) {
   return (
     <div className="rounded-xl bg-[#fbeadd] p-3">
-      <p className="text-[9px] font-semibold text-[#806000]">
-        {title}
-      </p>
+      <p className="text-[9px] font-semibold text-[#806000]">{title}</p>
 
-      <h3 className="mt-1 text-sm font-bold">
-        {value}
-      </h3>
+      <h3 className="mt-1 text-sm font-bold">{value}</h3>
 
-      <p className="mt-1 text-[9px] text-[#78675d]">
-        {description}
-      </p>
+      <p className="mt-1 text-[9px] text-[#78675d]">{description}</p>
     </div>
   )
 }
