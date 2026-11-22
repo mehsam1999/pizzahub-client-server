@@ -5,14 +5,14 @@ import type { ComponentProps } from "react"
 
 const exploreLinks = [
   { label: "Home", href: "/" },
-  { label: "Browse Menu", href: "/menu" },
+  { label: "Browse Menu", href: "/browse-menus" },
   { label: "Pizza Categories", href: "/menu/categories" },
 ]
 
 const accountLinks = [
   { label: "Sign In", href: "/sign-in" },
   { label: "Sign Up", href: "/sign-up" },
-  { label: "My Orders", href: "/orders" },
+  { label: "My Orders", href: "/my-orders" },
 ]
 
 const legalLinks = [

@@ -50,7 +50,7 @@ const HeroSection = () => {
               style={{ animationDelay: "180ms" }}
             >
               <Link
-                href="/menu"
+                href="/browse-menus"
                 className="group inline-flex h-12 items-center gap-2 rounded-full bg-[#f7c445] px-6 text-sm font-semibold text-[#231306] shadow-[0_10px_30px_-10px_rgba(247,196,69,0.7)] transition-colors hover:bg-[#ffd45e] focus-visible:ring-3 focus-visible:ring-[#f7c445]/50 focus-visible:outline-none sm:h-13 sm:px-7 sm:text-[15px]"
               >
                 Explore Pizza Menu
