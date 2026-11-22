@@ -113,12 +113,6 @@ const menuItemsByRole = {
       url: "/dashboard/customer/my-orders",
       icon: NotebookText,
     },
-    {
-      id: "customer-profile-settings",
-      name: "Profile Settings",
-      url: "/dashboard/customer/settings",
-      icon: Settings2,
-    },
   ],
 } satisfies Record<Role, MenuItem[]>
 
