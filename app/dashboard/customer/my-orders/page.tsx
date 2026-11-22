@@ -1,8 +1,7 @@
-
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Utensils } from "lucide-react"
+import { Utensils, X } from "lucide-react"
 
 import {
   Table,
@@ -19,14 +18,21 @@ import {
   type OrderStatusFilterValue,
 } from "@/app/components/OrderStatusFilter"
 import { OrderListPagination } from "@/app/components/OrderListPagination"
-import { ORDER_STATUSES } from "@/app/components/OrderStatusBadge"
+import {
+  ORDER_STATUSES,
+  OrderStatusBadge,
+} from "@/app/components/OrderStatusBadge"
+
+import { CancelOrderDialog } from "@/app/components/CancelOrderDialog"
 
 import {
   getCustomerOrders,
+  cancelCustomerOrder,
   type Order,
 } from "@/lib/actions/orders"
 
 import { useSession } from "@/lib/auth-client"
+import { toast } from "@/components/ui/toast"
 
 const PAGE_SIZE = 6
 
@@ -37,10 +43,16 @@ const CustomerMyOrdersPage = () => {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
+  const [cancelingOrderId, setCancelingOrderId] = useState<string | null>(null)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+
+  const [showDetailsCancelDialog, setShowDetailsCancelDialog] = useState(false)
+
   const [query, setQuery] = useState("")
   const [status, setStatus] = useState<OrderStatusFilterValue>("All")
   const [page, setPage] = useState(1)
 
+  // Fetch Customer Orders
   useEffect(() => {
     if (!user?.id) return
 
@@ -52,17 +64,49 @@ const CustomerMyOrdersPage = () => {
       .finally(() => setLoading(false))
   }, [user?.id])
 
+  // Cancel Order
+  const handleCancelOrder = async (order: Order) => {
+    if (!user?.id || order.status !== "Pending") return
+
+    try {
+      setCancelingOrderId(order._id)
+
+      await cancelCustomerOrder(order._id, user.id)
+
+      setOrders((prevOrders) =>
+        prevOrders.map((item) =>
+          item._id === order._id ? { ...item, status: "Cancelled" } : item
+        )
+      )
+
+      if (selectedOrder?._id === order._id) {
+        setSelectedOrder({ ...order, status: "Cancelled" })
+      }
+
+      toast.add({
+        title: "Order Cancelled",
+        description: "Your order has been cancelled successfully.",
+      })
+    } catch (error) {
+      console.error("Failed to cancel order:", error)
+
+      toast.add({
+        title: "Cancellation Failed",
+        description: "Unable to cancel your order. Please try again.",
+      })
+    } finally {
+      setCancelingOrderId(null)
+    }
+  }
+
+  // Search and Filter
   const filteredOrders = useMemo(() => {
     const search = query.trim().toLowerCase()
 
     return orders.filter((order) => {
       const matchesSearch =
         !search ||
-        [
-          order.itemName,
-          order.vendorName,
-          order.itemCategory,
-        ]
+        [order.itemName, order.vendorName, order.itemCategory]
           .join(" ")
           .toLowerCase()
           .includes(search)
@@ -71,24 +115,21 @@ const CustomerMyOrdersPage = () => {
     })
   }, [orders, query, status])
 
+  // Order Counts
   const counts = useMemo(() => {
     const totals: Partial<Record<OrderStatusFilterValue, number>> = {
       All: orders.length,
     }
 
     for (const option of ORDER_STATUSES) {
-      totals[option] = orders.filter(
-        (order) => order.status === option
-      ).length
+      totals[option] = orders.filter((order) => order.status === option).length
     }
 
     return totals
   }, [orders])
 
-  const pageCount = Math.max(
-    1,
-    Math.ceil(filteredOrders.length / PAGE_SIZE)
-  )
+  // Pagination
+  const pageCount = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE))
 
   const currentPage = Math.min(page, pageCount)
 
@@ -101,16 +142,13 @@ const CustomerMyOrdersPage = () => {
     ? (currentPage - 1) * PAGE_SIZE + 1
     : 0
 
-  const showingTo = Math.min(
-    currentPage * PAGE_SIZE,
-    filteredOrders.length
-  )
+  const showingTo = Math.min(currentPage * PAGE_SIZE, filteredOrders.length)
 
   const showingLabel = `Showing ${showingFrom}–${showingTo} of ${filteredOrders.length} orders`
 
   return (
     <main className="min-h-screen bg-[#fdf7ef] px-3 py-7 text-[#421d0d] sm:px-6 sm:py-9 lg:px-8">
-      <div className="mx-auto max-w-8xl">
+      <div className="max-w-8xl mx-auto">
         <p className="flex items-center gap-2 text-[9px] font-semibold tracking-[0.12em] text-[#8b5a24] uppercase sm:text-[10px] sm:tracking-[0.16em]">
           <Utensils className="size-3.5" aria-hidden />
           From Kitchen to Doorstep
@@ -124,6 +162,7 @@ const CustomerMyOrdersPage = () => {
           Track your orders and delivery information.
         </p>
 
+        {/* Search and Status Filter */}
         <div className="mt-5 rounded-xl bg-[#fdf2e5] p-2.5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <OrderSearchFilter
@@ -147,6 +186,7 @@ const CustomerMyOrdersPage = () => {
           </div>
         </div>
 
+        {/* Orders Table */}
         <section
           aria-label="My orders"
           className="mt-4 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-[#421d0d]/8"
@@ -175,7 +215,7 @@ const CustomerMyOrdersPage = () => {
                     Delivery address
                   </TableHead>
 
-                  <TableHead className="w-[120px] py-3 pr-4 text-[9px] font-semibold tracking-wide text-[#8b5a24] uppercase">
+                  <TableHead className="w-[180px] py-3 pr-4 text-[9px] font-semibold tracking-wide text-[#8b5a24] uppercase">
                     Order status
                   </TableHead>
                 </TableRow>
@@ -184,14 +224,23 @@ const CustomerMyOrdersPage = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <td colSpan={6} className="h-32 text-center text-sm text-[#8b7569]">
+                    <td
+                      colSpan={6}
+                      className="h-32 text-center text-sm text-[#8b7569]"
+                    >
                       Loading orders...
                     </td>
                   </TableRow>
                 ) : (
                   <>
                     {pageOrders.map((order) => (
-                      <MyOrderRow key={order._id} order={order} />
+                      <MyOrderRow
+                        key={order._id}
+                        order={order}
+                        onView={() => setSelectedOrder(order)}
+                        onCancel={() => handleCancelOrder(order)}
+                        isCancelling={cancelingOrderId === order._id}
+                      />
                     ))}
 
                     {pageOrders.length === 0 && (
@@ -219,6 +268,90 @@ const CustomerMyOrdersPage = () => {
           />
         </section>
       </div>
+
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-5 shadow-xl">
+            <button
+              type="button"
+              onClick={() => setSelectedOrder(null)}
+              className="absolute top-4 right-4 rounded-full p-1 text-[#6b5a4e] hover:bg-[#f3ece2]"
+            >
+              <X className="size-5" />
+            </button>
+
+            <h2 className="font-serif text-xl font-bold text-[#421d0d]">
+              Order Details
+            </h2>
+
+            <div className="mt-4 space-y-3 text-sm text-[#6b5a4e]">
+              <div>
+                <p className="font-semibold text-[#421d0d]">Item Name</p>
+                <p>{selectedOrder.itemName}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold text-[#421d0d]">Category</p>
+                <p>{selectedOrder.itemCategory}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold text-[#421d0d]">Vendor</p>
+                <p>{selectedOrder.vendorName}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold text-[#421d0d]">Delivery Date</p>
+                <p>{selectedOrder.deliveryDate}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold text-[#421d0d]">Delivery Address</p>
+                <p>{selectedOrder.deliveryAddress}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold text-[#421d0d]">
+                  Additional Message
+                </p>
+                <p>{selectedOrder.message || "No additional message"}</p>
+              </div>
+
+              <div>
+                <p className="mb-1 font-semibold text-[#421d0d]">Status</p>
+                <OrderStatusBadge status={selectedOrder.status} />
+              </div>
+            </div>
+
+            {selectedOrder.status === "Pending" && (
+              <button
+                type="button"
+                disabled={cancelingOrderId === selectedOrder._id}
+                onClick={() => setShowDetailsCancelDialog(true)}
+                className="mt-5 w-full rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                Cancel Order
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Details Modal Cancel Confirmation */}
+      <CancelOrderDialog
+        open={showDetailsCancelDialog}
+        onOpenChange={setShowDetailsCancelDialog}
+        onConfirm={() => {
+          if (selectedOrder) {
+            setShowDetailsCancelDialog(false)
+            handleCancelOrder(selectedOrder)
+          }
+        }}
+        isCancelling={
+          selectedOrder ? cancelingOrderId === selectedOrder._id : false
+        }
+      />
     </main>
   )
 }

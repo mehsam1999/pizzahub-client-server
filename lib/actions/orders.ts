@@ -2,8 +2,6 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 
 export type OrderStatus = "Pending" | "Accepted" | "Rejected" | "Cancelled"
 
-export const ORDER_TAX_RATE = 7
-
 export type OrderForm = {
   userId: string
   email: string
@@ -33,11 +31,34 @@ export const proccedItemOrder = async (data: OrderForm) => {
     },
     body: JSON.stringify(data),
   })
+  if (!res.ok) {
+    throw new Error("Failed to cancel order")
+  }
+
   return res.json()
 }
 
 export const getCustomerOrders = async (userId: string): Promise<Order[]> => {
   const res = await fetch(`${BASE_URL}/orders?userId=${userId}`)
-  
+  if (!res.ok) {
+    throw new Error("Failed to cancel order")
+  }
+
+  return res.json()
+}
+
+export const cancelCustomerOrder = async (orderId: string, userId: string) => {
+  const res = await fetch(`${BASE_URL}/orders/${orderId}/cancel`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId }),
+  })
+
+  if (!res.ok) {
+    throw new Error("Failed to cancel order")
+  }
+
   return res.json()
 }
