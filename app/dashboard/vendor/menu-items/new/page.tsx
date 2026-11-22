@@ -182,7 +182,7 @@ const AddMenuItemPage = () => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-8xl px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
+    <div className="mx-auto w-full max-w-7xl px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
 
       {/* Eyebrow */}
       <p className="flex items-center gap-2 text-[9px] font-semibold tracking-[0.12em] text-[#421d0d] uppercase sm:text-[10px] sm:tracking-[0.2em]">

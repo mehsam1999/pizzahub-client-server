@@ -32,7 +32,7 @@ export function OrderStatusFilter({
             type="button"
             aria-pressed={isActive}
             onClick={() => onChange(option)}
-            className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition-colors ${
+            className={`rounded-full px-3 py-2 text-xs font-medium transition-colors sm:py-1.5 sm:text-[10px] ${
               isActive
                 ? "bg-[#421d0d] text-white"
                 : "bg-[#fdf2e5] text-[#6b5143] hover:bg-[#f7e4d2]"

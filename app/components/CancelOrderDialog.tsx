@@ -27,7 +27,7 @@ export function CancelOrderDialog({
 }: CancelOrderDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-[400px] rounded-xl border-[#ead9cc]">
+      <AlertDialogContent className="w-[calc(100%-2rem)] max-w-[400px] rounded-xl border-[#ead9cc]">
         <AlertDialogHeader>
           <AlertDialogTitle className="font-serif text-lg text-[#421d0d]">
             Cancel Order?

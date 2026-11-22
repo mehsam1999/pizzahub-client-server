@@ -20,7 +20,7 @@ export function OrderListPagination({
   onPageChange: (page: number) => void
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-t border-[#421d0d]/8 px-3 py-2.5 text-[10px] text-[#8b7569] sm:px-4">
+    <div className="flex flex-col items-start gap-2 border-t border-[#421d0d]/8 px-3 py-2.5 text-[10px] text-[#8b7569] sm:flex-row sm:items-center sm:justify-between sm:px-4">
       <span>{showingLabel}</span>
 
       <div className="flex items-center gap-2">
@@ -29,7 +29,7 @@ export function OrderListPagination({
           aria-label="Previous page"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className="flex size-6 items-center justify-center rounded-md transition-colors hover:bg-[#f7e4d2] disabled:pointer-events-none disabled:opacity-40"
+          className="flex size-9 items-center justify-center rounded-md transition-colors hover:bg-[#f7e4d2] disabled:pointer-events-none disabled:opacity-40 sm:size-6"
         >
           <ChevronLeft className="size-3.5" />
         </button>
@@ -43,7 +43,7 @@ export function OrderListPagination({
           aria-label="Next page"
           disabled={page >= pageCount || totalItems === 0}
           onClick={() => onPageChange(page + 1)}
-          className="flex size-6 items-center justify-center rounded-md transition-colors hover:bg-[#f7e4d2] disabled:pointer-events-none disabled:opacity-40"
+          className="flex size-9 items-center justify-center rounded-md transition-colors hover:bg-[#f7e4d2] disabled:pointer-events-none disabled:opacity-40 sm:size-6"
         >
           <ChevronRight className="size-3.5" />
         </button>

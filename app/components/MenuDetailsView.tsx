@@ -123,25 +123,25 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
   return (
     <main className="min-h-screen bg-[#fff8f4] text-[#421d0d]">
       {/* Breadcrumb */}
-      <div className="border-b border-[#ead9cc] bg-[#fff0e4] px-5 py-3">
-        <div className="mx-auto flex max-w-7xl items-center gap-2 text-[11px] text-[#78675d]">
+      <div className="border-b border-[#ead9cc] bg-[#fff0e4] px-4 py-3 sm:px-5">
+        <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-hidden text-[11px] text-[#78675d]">
           <Link
             href="/"
-            className="flex items-center gap-1 hover:text-[#421d0d]"
+            className="flex shrink-0 items-center gap-1 hover:text-[#421d0d]"
           >
             <Home size={12} />
             Home
           </Link>
 
-          <ChevronRight size={12} />
+          <ChevronRight size={12} className="shrink-0" />
 
-          <Link href="/browse-menus" className="hover:text-[#421d0d]">
+          <Link href="/browse-menus" className="shrink-0 hover:text-[#421d0d]">
             Browse Menu
           </Link>
 
-          <ChevronRight size={12} />
+          <ChevronRight size={12} className="shrink-0" />
 
-          <span className="font-semibold text-[#421d0d]">
+          <span className="truncate font-semibold text-[#421d0d]">
             {menu.name}
           </span>
         </div>
@@ -235,8 +235,8 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
 
           {/* Vendor Card */}
           <div className="mt-5 rounded-xl bg-[#fbeadd] p-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex min-w-0 flex-1 items-center gap-3">
                 <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white">
                   <Store size={20} className="text-[#806000]" />
                 </div>
@@ -283,7 +283,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
           </div>
 
           {/* Category and Location */}
-          <div className="mt-5 grid grid-cols-2 gap-2">
+          <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
             <div className="rounded-lg bg-[#fbeadd] p-3">
               <p className="text-[9px] font-medium text-[#806000]">
                 CATEGORY
@@ -319,7 +319,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     placeholder="Enter your full name"
-                    className="h-10 w-full rounded-lg border border-[#ead9cc] bg-white px-3 text-xs outline-none focus:border-[#806000]"
+                    className="h-10 w-full rounded-lg border border-[#ead9cc] bg-white px-3 text-base outline-none focus:border-[#806000] sm:text-xs"
                   />
                 </div>
 
@@ -334,7 +334,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                     value={deliveryDate}
                     min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="h-10 w-full rounded-lg border border-[#ead9cc] bg-white px-3 text-xs outline-none focus:border-[#806000]"
+                    className="h-10 w-full rounded-lg border border-[#ead9cc] bg-white px-3 text-base outline-none focus:border-[#806000] sm:text-xs"
                   />
                 </div>
 
@@ -349,7 +349,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                     onChange={(e) => setDeliveryAddress(e.target.value)}
                     placeholder="Enter your delivery address"
                     rows={3}
-                    className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-xs outline-none focus:border-[#806000]"
+                    className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-base outline-none focus:border-[#806000] sm:text-xs"
                   />
                 </div>
 
@@ -364,7 +364,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Any special instructions?"
                     rows={2}
-                    className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-xs outline-none focus:border-[#806000]"
+                    className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-base outline-none focus:border-[#806000] sm:text-xs"
                   />
                 </div>
               </div>

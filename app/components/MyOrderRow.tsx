@@ -49,10 +49,10 @@ export function MyOrderRow({
   return (
     <>
       {/* Desktop and Tablet Order Row */}
-      <TableRow className="hidden border-[#421d0d]/8 hover:bg-[#fffaf5] md:table-row">
+      <TableRow className="hidden border-[#421d0d]/8 hover:bg-[#fffaf5] xl:table-row">
 
         {/* Item Image */}
-        <TableCell className="w-[100px] px-3 py-4 align-top lg:px-4">
+        <TableCell className="w-[100px] px-3 py-4 align-top whitespace-normal lg:px-4">
           <div className="size-12 overflow-hidden rounded-lg bg-[#fdf2e5] lg:size-14">
             <img
               src={order.imageUrl}
@@ -63,7 +63,7 @@ export function MyOrderRow({
         </TableCell>
 
         {/* Item Information */}
-        <TableCell className="min-w-0 py-4 align-top">
+        <TableCell className="min-w-0 py-4 align-top whitespace-normal">
           <p className="break-words font-serif text-sm font-semibold text-[#421d0d]">
             {order.itemName}
           </p>
@@ -87,7 +87,7 @@ export function MyOrderRow({
           <button
             type="button"
             onClick={onView}
-            className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-[#8b5a24] hover:text-[#421d0d] hover:underline"
+            className="mt-2 inline-flex items-center gap-1 py-1 text-[11px] font-semibold text-[#8b5a24] transition-colors hover:text-[#421d0d] hover:underline sm:py-0 sm:text-[10px]"
           >
             <Eye className="size-3" />
             View Details
@@ -95,7 +95,7 @@ export function MyOrderRow({
         </TableCell>
 
         {/* Vendor */}
-        <TableCell className="min-w-0 py-4 align-top">
+        <TableCell className="min-w-0 py-4 align-top whitespace-normal">
           <p className="flex items-center gap-1.5 text-xs font-semibold text-[#421d0d]">
             <Store className="size-3.5 shrink-0 text-[#8b5a24]" />
             <span className="break-words">{order.vendorName}</span>
@@ -103,7 +103,7 @@ export function MyOrderRow({
         </TableCell>
 
         {/* Delivery Date */}
-        <TableCell className="min-w-0 py-4 align-top">
+        <TableCell className="min-w-0 py-4 align-top whitespace-normal">
           <p className="text-xs leading-relaxed text-[#421d0d]">
             {formattedDate}
           </p>
@@ -124,7 +124,7 @@ export function MyOrderRow({
         </TableCell>
 
         {/* Delivery Address */}
-        <TableCell className="min-w-0 py-4 align-top">
+        <TableCell className="min-w-0 py-4 align-top whitespace-normal">
           <p className="flex items-start gap-1 text-[10px] leading-relaxed text-[#6b5a4e]">
             <MapPin className="mt-0.5 size-3 shrink-0" />
             <span className="break-words">{order.deliveryAddress}</span>
@@ -132,7 +132,7 @@ export function MyOrderRow({
         </TableCell>
 
         {/* Status and Cancel Action */}
-        <TableCell className="w-[180px] min-w-[150px] py-4 pr-3 align-top lg:pr-4">
+        <TableCell className="w-[180px] min-w-[150px] py-4 pr-3 align-top whitespace-normal lg:pr-4">
           <div className="flex flex-wrap items-center gap-2">
             <OrderStatusBadge status={order.status} />
 
@@ -152,13 +152,13 @@ export function MyOrderRow({
       </TableRow>
 
       {/* Mobile Order Card */}
-      <TableRow className="border-0 hover:bg-transparent md:hidden">
-        <TableCell colSpan={6} className="p-2">
-          <div className="rounded-xl border border-[#ead9cc] bg-white p-3 shadow-sm">
+      <TableRow className="border-0 hover:bg-transparent xl:hidden">
+        <TableCell colSpan={6} className="p-2 align-top whitespace-normal sm:p-3">
+          <div className="rounded-xl border border-[#ead9cc] bg-white p-3 shadow-sm sm:p-4">
 
             {/* Item Header */}
             <div className="flex gap-3">
-              <div className="size-16 shrink-0 overflow-hidden rounded-lg bg-[#fdf2e5]">
+              <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-[#fdf2e5] sm:size-16">
                 <img
                   src={order.imageUrl}
                   alt={order.itemName}
@@ -190,7 +190,7 @@ export function MyOrderRow({
                 <button
                   type="button"
                   onClick={onView}
-                  className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-[#8b5a24] hover:text-[#421d0d] hover:underline"
+                  className="mt-2 inline-flex items-center gap-1 py-1 text-[11px] font-semibold text-[#8b5a24] transition-colors hover:text-[#421d0d] hover:underline sm:py-0 sm:text-[10px]"
                 >
                   <Eye className="size-3" />
                   View Details
@@ -253,7 +253,7 @@ export function MyOrderRow({
             </div>
 
             {/* Status and Cancel Action */}
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#ead9cc] pt-3">
+            <div className="mt-3 flex flex-col gap-2 border-t border-[#ead9cc] pt-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
               <OrderStatusBadge status={order.status} />
 
               {order.status === "Pending" && (
@@ -261,7 +261,7 @@ export function MyOrderRow({
                   type="button"
                   onClick={() => setShowCancelDialog(true)}
                   disabled={isCancelling}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                 >
                   <XCircle className="size-3.5" />
                   Cancel Order

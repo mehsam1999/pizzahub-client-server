@@ -148,7 +148,7 @@ const CustomerMyOrdersPage = () => {
 
   return (
     <main className="min-h-screen bg-[#fdf7ef] px-3 py-7 text-[#421d0d] sm:px-6 sm:py-9 lg:px-8">
-      <div className="max-w-8xl mx-auto">
+      <div className="mx-auto w-full max-w-7xl">
         <p className="flex items-center gap-2 text-[9px] font-semibold tracking-[0.12em] text-[#8b5a24] uppercase sm:text-[10px] sm:tracking-[0.16em]">
           <Utensils className="size-3.5" aria-hidden />
           From Kitchen to Doorstep
@@ -192,8 +192,8 @@ const CustomerMyOrdersPage = () => {
           className="mt-4 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-[#421d0d]/8"
         >
           <div className="overflow-x-auto">
-            <Table className="min-w-[900px] table-fixed">
-              <TableHeader className="bg-[#fdf2e5]">
+            <Table className="w-full table-fixed md:table-auto xl:min-w-[900px]">
+              <TableHeader className="hidden bg-[#fdf2e5] xl:table-header-group">
                 <TableRow className="border-0 hover:bg-transparent">
                   <TableHead className="w-20 px-4 py-3 text-[9px] font-semibold tracking-wide text-[#8b5a24] uppercase">
                     Item image
@@ -271,21 +271,22 @@ const CustomerMyOrdersPage = () => {
 
       {/* Order Details Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4">
+          <div className="relative max-h-[92vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 pb-6 shadow-xl sm:max-h-[90vh] sm:max-w-lg sm:rounded-xl sm:pb-5">
             <button
               type="button"
               onClick={() => setSelectedOrder(null)}
-              className="absolute top-4 right-4 rounded-full p-1 text-[#6b5a4e] hover:bg-[#f3ece2]"
+              aria-label="Close order details"
+              className="absolute top-4 right-4 rounded-full p-1 text-[#6b5a4e] transition-colors hover:bg-[#f3ece2]"
             >
               <X className="size-5" />
             </button>
 
-            <h2 className="font-serif text-xl font-bold text-[#421d0d]">
+            <h2 className="pr-8 font-serif text-xl font-bold text-[#421d0d]">
               Order Details
             </h2>
 
-            <div className="mt-4 space-y-3 text-sm text-[#6b5a4e]">
+            <div className="mt-4 grid grid-cols-1 gap-3 text-sm text-[#6b5a4e] [&_p]:break-words sm:grid-cols-2">
               <div>
                 <p className="font-semibold text-[#421d0d]">Item Name</p>
                 <p>{selectedOrder.itemName}</p>
@@ -306,12 +307,12 @@ const CustomerMyOrdersPage = () => {
                 <p>{selectedOrder.deliveryDate}</p>
               </div>
 
-              <div>
+              <div className="min-w-0 sm:col-span-2">
                 <p className="font-semibold text-[#421d0d]">Delivery Address</p>
                 <p>{selectedOrder.deliveryAddress}</p>
               </div>
 
-              <div>
+              <div className="min-w-0 sm:col-span-2">
                 <p className="font-semibold text-[#421d0d]">
                   Additional Message
                 </p>

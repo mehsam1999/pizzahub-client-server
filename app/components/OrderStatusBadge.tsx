@@ -52,7 +52,7 @@ export function OrderStatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[9px] font-semibold tracking-wide uppercase ${styles.badge}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase sm:py-1.5 sm:text-[9px] ${styles.badge}`}
     >
       <span
         className={`size-1.5 rounded-full ${styles.dot}`}

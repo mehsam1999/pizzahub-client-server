@@ -72,7 +72,7 @@ export default function MyMenuItemsPage() {
 
   return (
     <main className="min-h-screen bg-[#fff8f4] px-3 py-7 text-[#421d0d] sm:px-6 sm:py-9 lg:px-8">
-      <div className="mx-auto max-w-8xl">
+      <div className="mx-auto w-full max-w-7xl">
         <p className="flex items-center gap-2 text-[9px] font-semibold tracking-[0.12em] text-[#8b5a24] uppercase sm:text-[10px] sm:tracking-[0.16em]">
           <Utensils className="size-3.5" aria-hidden />
           Artisan Roster • Master Inventory
@@ -171,30 +171,30 @@ export default function MyMenuItemsPage() {
           className="mt-4 rounded-xl bg-white shadow-sm ring-1 ring-[#421d0d]/5"
         >
           <div className="overflow-x-auto rounded-t-xl">
-            <Table className="min-w-[760px] table-fixed">
+            <Table className="w-full table-auto sm:table-fixed sm:min-w-[620px] lg:min-w-[760px]">
               <TableHeader className="bg-[#fff1e5]">
                 <TableRow className="border-0 hover:bg-transparent">
-                  <TableHead className="w-14 px-4 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                  <TableHead className="hidden w-14 px-4 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase sm:table-cell">
                     Item
                   </TableHead>
 
-                  <TableHead className="w-[48%] py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                  <TableHead className="w-[48%] py-3 pl-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase sm:pl-0">
                     Heritage dish &amp; description
                   </TableHead>
 
-                  <TableHead className="w-40 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                  <TableHead className="hidden w-40 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase md:table-cell">
                     Category
                   </TableHead>
 
-                  <TableHead className="w-20 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                  <TableHead className="w-14 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase sm:w-20">
                     Price
                   </TableHead>
 
-                  <TableHead className="w-28 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                  <TableHead className="w-20 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase sm:w-28">
                     Approval status
                   </TableHead>
 
-                  <TableHead className="w-28 px-4 py-3 text-right text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                  <TableHead className="w-24 px-1 py-3 text-right text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase sm:w-28 sm:px-4">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -206,7 +206,7 @@ export default function MyMenuItemsPage() {
                     key={item._id}
                     className={`border-[#421d0d]/5 ${item.status === "Rejected" ? "opacity-60" : ""}`}
                   >
-                    <TableCell className="px-4 py-2.5">
+                    <TableCell className="hidden px-4 py-2.5 sm:table-cell">
                       <div className="size-10 overflow-hidden rounded-lg bg-[#fdf2e5]">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -217,7 +217,7 @@ export default function MyMenuItemsPage() {
                       </div>
                     </TableCell>
 
-                    <TableCell className="max-w-0 py-2.5">
+                    <TableCell className="max-w-0 py-2.5 pl-3 sm:pl-0">
                       <p className="truncate font-serif text-sm font-bold text-[#421d0d]">
                         {item.name}
                       </p>
@@ -229,7 +229,7 @@ export default function MyMenuItemsPage() {
                       </p>
                     </TableCell>
 
-                    <TableCell className="py-2.5">
+                    <TableCell className="hidden py-2.5 md:table-cell">
                       <span className="inline-block max-w-full truncate rounded-full bg-[#fdf0e4] px-2 py-1 text-[9px] leading-3 whitespace-nowrap text-[#421d0d]">
                         {item.category}
                       </span>
@@ -250,14 +250,14 @@ export default function MyMenuItemsPage() {
                       </span>
                     </TableCell>
 
-                    <TableCell className="px-4 py-2.5">
-                      <div className="flex justify-end gap-1">
+                    <TableCell className="px-1 py-2.5 sm:px-4">
+                      <div className="flex justify-end gap-0.5 sm:gap-1">
                         <Button
                           variant="ghost"
                           size="icon"
                           aria-label={`View ${item.name}`}
                           onClick={() => setViewingItem(item)}
-                          className="size-8 rounded-md bg-[#fdf0e4] hover:bg-[#f7e4d2]"
+                          className="size-7 rounded-md bg-[#fdf0e4] hover:bg-[#f7e4d2] sm:size-8"
                         >
                           <Eye className="size-4" />
                         </Button>
@@ -267,7 +267,7 @@ export default function MyMenuItemsPage() {
                           size="icon"
                           aria-label={`Edit ${item.name}`}
                           onClick={() => setEditingItem(item)}
-                          className="size-8 rounded-md bg-[#fdf0e4] hover:bg-[#f7e4d2]"
+                          className="size-7 rounded-md bg-[#fdf0e4] hover:bg-[#f7e4d2] sm:size-8"
                         >
                           <Pencil className="size-4" />
                         </Button>
