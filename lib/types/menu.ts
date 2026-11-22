@@ -12,7 +12,7 @@ export type MenuItemForm = {
 }
 
 export type MenuItem = MenuItemForm & {
-  _id: number
+  _id: string
   vendorId?: string
   vendorName?: string
   vendor?: { _id?: string; name?: string } | string

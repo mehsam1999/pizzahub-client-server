@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -21,10 +22,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+
 import { MENU_CATEGORIES } from "@/lib/constants/menu"
 import type { MenuItem } from "@/lib/types/menu"
 import { getMenus } from "@/lib/api/getMenus"
 import { DeleteMenuDialog } from "@/app/components/DeleteMenuDialog"
+import { EditMenuDialog } from "@/app/components/EditMenuDialog"
+import { ViewMenuDialog } from "@/app/components/ViewMenuDialog"
 
 const PAGE_SIZE = 6
 
@@ -34,6 +38,9 @@ export default function MyMenuItemsPage() {
   const [category, setCategory] = useState("All")
   const [status, setStatus] = useState("All")
   const [page, setPage] = useState(1)
+
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
+  const [viewingItem, setViewingItem] = useState<MenuItem | null>(null)
 
   useEffect(() => {
     getMenus().then(setMenus)
@@ -57,6 +64,7 @@ export default function MyMenuItemsPage() {
 
   const pageCount = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE))
   const currentPage = Math.min(page, pageCount)
+
   const pageItems = filteredItems.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
@@ -79,6 +87,7 @@ export default function MyMenuItemsPage() {
           active dishes appear to customers on PizzaHub.
         </p>
 
+        {/* Search and Filters */}
         <div className="mt-5 flex flex-col gap-2 rounded-xl bg-white p-2.5 shadow-sm sm:flex-row sm:items-center">
           <div className="relative min-w-0 flex-1">
             <Search
@@ -112,6 +121,7 @@ export default function MyMenuItemsPage() {
             >
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
+
             <SelectContent>
               <SelectItem value="All">All Categories</SelectItem>
               {MENU_CATEGORIES.map((item) => (
@@ -137,6 +147,7 @@ export default function MyMenuItemsPage() {
             >
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
+
             <SelectContent>
               <SelectItem value="All">All Statuses</SelectItem>
               <SelectItem value="Approved">Approved</SelectItem>
@@ -154,124 +165,134 @@ export default function MyMenuItemsPage() {
           </Link>
         </div>
 
+        {/* Menu Items Table */}
         <section
           aria-label="Menu items"
           className="mt-4 rounded-xl bg-white shadow-sm ring-1 ring-[#421d0d]/5"
         >
           <div className="overflow-x-auto rounded-t-xl">
-          <Table className="min-w-[760px] table-fixed">
-            <TableHeader className="bg-[#fff1e5]">
-              <TableRow className="border-0 hover:bg-transparent">
-                <TableHead className="w-14 px-4 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
-                  Item
-                </TableHead>
-                <TableHead className="w-[48%] py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
-                  Heritage dish &amp; description
-                </TableHead>
-                <TableHead className="w-40 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
-                  Category
-                </TableHead>
-                <TableHead className="w-20 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
-                  Price
-                </TableHead>
-                <TableHead className="w-28 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
-                  Approval status
-                </TableHead>
-                <TableHead className="w-28 px-4 py-3 text-right text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
+            <Table className="min-w-[760px] table-fixed">
+              <TableHeader className="bg-[#fff1e5]">
+                <TableRow className="border-0 hover:bg-transparent">
+                  <TableHead className="w-14 px-4 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                    Item
+                  </TableHead>
 
-            <TableBody>
-              {pageItems.map((item) => (
-                <TableRow
-                  key={item._id}
-                  className={`border-[#421d0d]/5 ${item.status === "Rejected" ? "opacity-60" : ""}`}
-                >
-                  <TableCell className="px-4 py-2.5">
-                    <div className="size-10 overflow-hidden rounded-lg bg-[#fdf2e5]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.imageUrl}
-                        alt={item.name}
-                        className="size-full object-cover"
-                      />
-                    </div>
-                  </TableCell>
+                  <TableHead className="w-[48%] py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                    Heritage dish &amp; description
+                  </TableHead>
 
-                  <TableCell className="max-w-0 py-2.5">
-                    <p className="truncate font-serif text-sm font-bold text-[#421d0d]">
-                      {item.name}
-                    </p>
-                    <p
-                      className={`mt-0.5 truncate text-[10px] ${item.status === "Rejected" ? "text-red-600" : "text-[#78675d]"}`}
-                    >
-                      {item.description}
-                    </p>
-                  </TableCell>
+                  <TableHead className="w-40 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                    Category
+                  </TableHead>
 
-                  <TableCell className="py-2.5">
-                    <span className="inline-block max-w-full truncate rounded-full bg-[#fdf0e4] px-2 py-1 text-[9px] leading-3 whitespace-nowrap text-[#421d0d]">
-                      {item.category}
-                    </span>
-                  </TableCell>
+                  <TableHead className="w-20 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                    Price
+                  </TableHead>
 
-                  <TableCell className="py-2.5 text-xs font-bold tabular-nums">
-                    ${Number(item.price).toFixed(2)}
-                  </TableCell>
+                  <TableHead className="w-28 py-3 text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                    Approval status
+                  </TableHead>
 
-                  <TableCell className="py-2.5">
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-medium ${item.status === "Approved" ? "bg-[#f4e8da]" : item.status === "Pending" ? "bg-[#fff3cd]" : "bg-[#ffe1df] text-red-800"}`}
-                    >
-                      <span
-                        className={`size-1.5 rounded-full ${item.status === "Approved" ? "bg-[#f6c445]" : item.status === "Pending" ? "bg-[#d89d00]" : "bg-red-600"}`}
-                      />
-                      {item.status}
-                    </span>
-                  </TableCell>
-
-                  <TableCell className="px-4 py-2.5">
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`View ${item.name}`}
-                        className="size-8 rounded-md bg-[#fdf0e4] hover:bg-[#f7e4d2]"
-                      >
-                        <Eye className="size-4" />
-                      </Button>
-
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`Edit ${item.name}`}
-                        className="size-8 rounded-md bg-[#fdf0e4] hover:bg-[#f7e4d2]"
-                      >
-                        <Pencil className="size-4" />
-                      </Button>
-
-                      <DeleteMenuDialog item={item}></DeleteMenuDialog>
-                    </div>
-                  </TableCell>
+                  <TableHead className="w-28 px-4 py-3 text-right text-[9px] font-semibold tracking-wide text-[#6b5a4e] uppercase">
+                    Actions
+                  </TableHead>
                 </TableRow>
-              ))}
+              </TableHeader>
 
-              {pageItems.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="h-28 text-center text-sm text-[#78675d]"
+              <TableBody>
+                {pageItems.map((item) => (
+                  <TableRow
+                    key={item._id}
+                    className={`border-[#421d0d]/5 ${item.status === "Rejected" ? "opacity-60" : ""}`}
                   >
-                    No menu items match your filters.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                    <TableCell className="px-4 py-2.5">
+                      <div className="size-10 overflow-hidden rounded-lg bg-[#fdf2e5]">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={item.imageUrl}
+                          alt={item.name}
+                          className="size-full object-cover"
+                        />
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="max-w-0 py-2.5">
+                      <p className="truncate font-serif text-sm font-bold text-[#421d0d]">
+                        {item.name}
+                      </p>
+
+                      <p
+                        className={`mt-0.5 truncate text-[10px] ${item.status === "Rejected" ? "text-red-600" : "text-[#78675d]"}`}
+                      >
+                        {item.description}
+                      </p>
+                    </TableCell>
+
+                    <TableCell className="py-2.5">
+                      <span className="inline-block max-w-full truncate rounded-full bg-[#fdf0e4] px-2 py-1 text-[9px] leading-3 whitespace-nowrap text-[#421d0d]">
+                        {item.category}
+                      </span>
+                    </TableCell>
+
+                    <TableCell className="py-2.5 text-xs font-bold tabular-nums">
+                      ${Number(item.price).toFixed(2)}
+                    </TableCell>
+
+                    <TableCell className="py-2.5">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-medium ${item.status === "Approved" ? "bg-[#f4e8da]" : item.status === "Pending" ? "bg-[#fff3cd]" : "bg-[#ffe1df] text-red-800"}`}
+                      >
+                        <span
+                          className={`size-1.5 rounded-full ${item.status === "Approved" ? "bg-[#f6c445]" : item.status === "Pending" ? "bg-[#d89d00]" : "bg-red-600"}`}
+                        />
+                        {item.status}
+                      </span>
+                    </TableCell>
+
+                    <TableCell className="px-4 py-2.5">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`View ${item.name}`}
+                          onClick={() => setViewingItem(item)}
+                          className="size-8 rounded-md bg-[#fdf0e4] hover:bg-[#f7e4d2]"
+                        >
+                          <Eye className="size-4" />
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`Edit ${item.name}`}
+                          onClick={() => setEditingItem(item)}
+                          className="size-8 rounded-md bg-[#fdf0e4] hover:bg-[#f7e4d2]"
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+
+                        <DeleteMenuDialog item={item} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+
+                {pageItems.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="h-28 text-center text-sm text-[#78675d]"
+                    >
+                      No menu items match your filters.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
 
+          {/* Pagination */}
           <div className="flex flex-col gap-3 border-t border-[#421d0d]/5 px-3 py-3 text-[10px] text-[#78675d] sm:flex-row sm:items-center sm:justify-between sm:px-4">
             <span>
               Showing{" "}
@@ -324,6 +345,34 @@ export default function MyMenuItemsPage() {
             </nav>
           </div>
         </section>
+
+        {/* View Details Dialog */}
+        <ViewMenuDialog
+          item={viewingItem}
+          open={!!viewingItem}
+          onOpenChange={(open) => {
+            if (!open) setViewingItem(null)
+          }}
+        />
+
+        {/* Edit Dialog */}
+        <EditMenuDialog
+          item={editingItem}
+          open={!!editingItem}
+          onOpenChange={(open) => {
+            if (!open) setEditingItem(null)
+          }}
+          onUpdated={(updatedItem) => {
+            setMenus((prev) =>
+              prev.map((menu) =>
+                String(menu._id) === String(updatedItem._id)
+                  ? updatedItem
+                  : menu
+              )
+            )
+            setEditingItem(null)
+          }}
+        />
       </div>
     </main>
   )

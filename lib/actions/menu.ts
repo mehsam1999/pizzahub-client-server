@@ -21,9 +21,9 @@ export const createMenu = async (data: MenuItemForm) => {
   const menu = {
     ...data,
     imageUrl: data.imageUrl.trim(),
-    images: (data.images ?? []).filter(
-      (image) => typeof image === "string" && image.trim() !== ""
-    ).map((image) => image.trim()),
+    images: (data.images ?? [])
+      .filter((image) => typeof image === "string" && image.trim() !== "")
+      .map((image) => image.trim()),
     vendorId: session.user.id,
     vendorName: session.user.name?.trim() || session.user.email,
     status: "Pending" as const,
@@ -42,6 +42,47 @@ export const createMenu = async (data: MenuItemForm) => {
   }
 
   revalidatePath("/browse-menus")
+  revalidatePath("/dashboard/vendor/menu-items")
+
+  return res.json()
+}
+
+// Update menu item
+export const updateMenu = async (menuId: string, data: MenuItemForm) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
+  if (!session?.user || session.user.role !== "vendor") {
+    throw new Error("Only authenticated vendors can update menu items")
+  }
+
+  const updatedMenu = {
+    ...data,
+    imageUrl: data.imageUrl.trim(),
+    images: (data.images ?? [])
+      .filter((image) => typeof image === "string" && image.trim() !== "")
+      .map((image) => image.trim()),
+    vendorId: session.user.id,
+    vendorName: session.user.name?.trim() || session.user.email,
+    status: "Pending" as const,
+  }
+
+  const res = await fetch(`${BASE_URL}/menus/${menuId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updatedMenu),
+  })
+
+  if (!res.ok) {
+    throw new Error("Failed to update menu item")
+  }
+
+  revalidatePath("/browse-menus")
+  revalidatePath("/dashboard/vendor/menu-items")
+
   return res.json()
 }
 
@@ -55,5 +96,7 @@ export const deleteMenu = async (menuId: string) => {
   }
 
   revalidatePath("/browse-menus")
+  revalidatePath("/dashboard/vendor/menu-items")
+
   return res.json()
 }
