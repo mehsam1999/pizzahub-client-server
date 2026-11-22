@@ -1,9 +1,10 @@
+
 "use client"
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
-import { Check, Eye, EyeOff, ShieldCheck, Store, User } from "lucide-react"
+import { Check, Eye, EyeOff, Store, User } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { authClient } from "@/lib/auth-client"
@@ -11,6 +12,7 @@ import type { Role } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { toast } from "@/components/ui/toast"
 
 const tabs = [
   { label: "Sign In", href: "/sign-in" },
@@ -29,12 +31,6 @@ const roleOptions = [
     label: "Vendor",
     description: "Sell your menu",
     icon: Store,
-  },
-  {
-    value: "admin",
-    label: "Admin",
-    description: "Manage platform",
-    icon: ShieldCheck,
   },
 ] satisfies {
   value: Role
@@ -77,7 +73,6 @@ const SignUpPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Form values
   const [values, setValues] = useState({
     name: "",
     email: "",
@@ -87,7 +82,6 @@ const SignUpPage = () => {
     terms: false,
   })
 
-  // Reusable setField function
   const setField =
     (field: keyof typeof values) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,12 +101,10 @@ const SignUpPage = () => {
       }))
     }
 
-  // Better Auth Sign Up
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError(null)
 
-    // Password validation
     const passwordValidation =
       values.password.length >= 6 &&
       /[A-Z]/.test(values.password) &&
@@ -125,13 +117,11 @@ const SignUpPage = () => {
       return
     }
 
-    // Confirm password validation
     if (values.password !== values.confirmPassword) {
       setError("Passwords do not match. Please re-enter them.")
       return
     }
 
-    // Terms validation
     if (!values.terms) {
       setError("Please accept the Terms of Service and Privacy Policy.")
       return
@@ -144,7 +134,6 @@ const SignUpPage = () => {
         name: values.name,
         email: values.email,
         password: values.password,
-        role: values.role,
         callbackURL: "/",
       })
 
@@ -162,6 +151,20 @@ const SignUpPage = () => {
       setError("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleGoogleLogin = async () => {
+    const data = await authClient.signIn.social({
+      provider: "google",
+    })
+
+    if (data) {
+      toast.add({
+        type: "success",
+        description: "You have successfully signed in with Google!",
+      })
+      router.push("/")
     }
   }
 
@@ -213,14 +216,13 @@ const SignUpPage = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-7 space-y-5">
-            
             {/* Account type */}
             <fieldset className="space-y-2">
-              <legend className="text-sm font-medium text-[#3d2010]">
-               Join PizzaHUb as
+              <legend className="w-full text-center text-sm font-medium text-[#3d2010]">
+                Join PizzaHub as
               </legend>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="mx-auto grid max-w-[228px] grid-cols-2 gap-2">
                 {roleOptions.map((option) => {
                   const Icon = option.icon
                   const isSelected = values.role === option.value
@@ -261,6 +263,7 @@ const SignUpPage = () => {
                       <span className="text-[12px] leading-none font-semibold">
                         {option.label}
                       </span>
+
                       <span
                         className={cn(
                           "text-[10px] leading-tight",
@@ -438,10 +441,7 @@ const SignUpPage = () => {
           {/* Continue with Google */}
           <button
             type="button"
-            onClick={() => {
-              // TODO: wire up authClient.signIn.social({ provider: "google" })
-              console.log("Continue with Google clicked")
-            }}
+            onClick={handleGoogleLogin}
             className={googleButtonClass}
           >
             <GoogleIcon className="size-[18px]" />

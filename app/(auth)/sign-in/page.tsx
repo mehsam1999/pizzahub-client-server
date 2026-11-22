@@ -112,6 +112,11 @@ const SignInPage = () => {
       setIsLoading(false)
     }
   }
+  const handleGoogleSignup = async () => {
+    const data = await authClient.signIn.social({
+      provider: "google",
+    });
+  };
 
   return (
     <section className="bg-gradient-to-b from-[#fdf6ec] via-[#fdf9f4] to-[#fbeee4] px-5 py-12 sm:px-6 sm:py-16 lg:py-20">
@@ -271,10 +276,7 @@ const SignInPage = () => {
           {/* Continue with Google */}
           <button
             type="button"
-            onClick={() => {
-              // TODO: wire up authClient.signIn.social({ provider: "google" })
-              console.log("Continue with Google clicked")
-            }}
+            onClick={handleGoogleSignup}
             className={googleButtonClass}
           >
             <GoogleIcon className="size-[18px]" />
