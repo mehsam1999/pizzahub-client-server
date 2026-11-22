@@ -110,11 +110,27 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
     } catch (error) {
       console.error("Order submission failed:", error)
 
-      toast.add({
-        title: "Order failed",
-        description: "Something went wrong. Please try again.",
-        type: "error",
-      })
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+
+      if (
+        errorMessage ===
+        "You already have an active order for this item."
+      ) {
+        toast.add({
+          title: "Already Ordered",
+          description: errorMessage,
+          type: "error",
+        })
+      } else {
+        toast.add({
+          title: "Order failed",
+          description: errorMessage,
+          type: "error",
+        })
+      }
     } finally {
       setIsSubmitting(false)
     }

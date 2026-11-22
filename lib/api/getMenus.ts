@@ -15,3 +15,17 @@ export const getMenusById = async (
   const res = await fetch(`${BASE_URL}/menus/${menuId}`)
   return res.json()
 }
+
+export const getVendorMenuCount = async (
+  vendorId: string
+): Promise<number> => {
+  const res = await fetch(`${BASE_URL}/menus/count/${vendorId}`)
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch vendor menu count")
+  }
+
+  const data: { count: number } = await res.json()
+
+  return data.count
+}

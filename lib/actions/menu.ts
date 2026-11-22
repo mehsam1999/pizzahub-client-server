@@ -7,8 +7,10 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import type { MenuItemForm } from "@/lib/types/menu"
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 
+// Create menu item
 export const createMenu = async (data: MenuItemForm) => {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -22,7 +24,10 @@ export const createMenu = async (data: MenuItemForm) => {
     ...data,
     imageUrl: data.imageUrl.trim(),
     images: (data.images ?? [])
-      .filter((image) => typeof image === "string" && image.trim() !== "")
+      .filter(
+        (image) =>
+          typeof image === "string" && image.trim() !== ""
+      )
       .map((image) => image.trim()),
     vendorId: session.user.id,
     vendorName: session.user.name?.trim() || session.user.email,
@@ -37,18 +42,29 @@ export const createMenu = async (data: MenuItemForm) => {
     body: JSON.stringify(menu),
   })
 
+  const responseData = await res.json()
+
+  if (res.status === 403 && responseData.code === "MENU_LIMIT_REACHED") {
+    throw new Error("MENU_LIMIT_REACHED")
+  }
+
   if (!res.ok) {
-    throw new Error("Failed to create menu item")
+    throw new Error(
+      responseData.message || "Failed to create menu item"
+    )
   }
 
   revalidatePath("/browse-menus")
   revalidatePath("/dashboard/vendor/menu-items")
 
-  return res.json()
+  return responseData
 }
 
 // Update menu item
-export const updateMenu = async (menuId: string, data: MenuItemForm) => {
+export const updateMenu = async (
+  menuId: string,
+  data: MenuItemForm
+) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   })
@@ -61,7 +77,10 @@ export const updateMenu = async (menuId: string, data: MenuItemForm) => {
     ...data,
     imageUrl: data.imageUrl.trim(),
     images: (data.images ?? [])
-      .filter((image) => typeof image === "string" && image.trim() !== "")
+      .filter(
+        (image) =>
+          typeof image === "string" && image.trim() !== ""
+      )
       .map((image) => image.trim()),
     vendorId: session.user.id,
     vendorName: session.user.name?.trim() || session.user.email,
@@ -86,6 +105,7 @@ export const updateMenu = async (menuId: string, data: MenuItemForm) => {
   return res.json()
 }
 
+// Delete menu item
 export const deleteMenu = async (menuId: string) => {
   const res = await fetch(`${BASE_URL}/menus/${menuId}`, {
     method: "DELETE",

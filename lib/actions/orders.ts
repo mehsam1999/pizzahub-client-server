@@ -23,6 +23,7 @@ export type Order = OrderForm & {
   _id: string
 }
 
+
 export const proccedItemOrder = async (data: OrderForm) => {
   const res = await fetch(`${BASE_URL}/orders`, {
     method: "POST",
@@ -31,12 +32,18 @@ export const proccedItemOrder = async (data: OrderForm) => {
     },
     body: JSON.stringify(data),
   })
+
   if (!res.ok) {
-    throw new Error("Failed to cancel order")
+    const error = await res.json()
+
+    throw new Error(
+      error.message || "Failed to place order"
+    )
   }
 
   return res.json()
 }
+
 
 export const getCustomerOrders = async (userId: string): Promise<Order[]> => {
   const res = await fetch(`${BASE_URL}/orders?userId=${userId}`)

@@ -5,6 +5,9 @@ import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 import { Eye, Pencil, Plus, Search, Utensils } from "lucide-react"
 
+import { useSession } from "@/lib/auth-client"
+import { getVendorMenuCount, getMenus } from "@/lib/api/getMenus"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -25,7 +28,6 @@ import {
 
 import { MENU_CATEGORIES } from "@/lib/constants/menu"
 import type { MenuItem } from "@/lib/types/menu"
-import { getMenus } from "@/lib/api/getMenus"
 import { DeleteMenuDialog } from "@/app/components/DeleteMenuDialog"
 import { EditMenuDialog } from "@/app/components/EditMenuDialog"
 import { ViewMenuDialog } from "@/app/components/ViewMenuDialog"
@@ -33,7 +35,12 @@ import { ViewMenuDialog } from "@/app/components/ViewMenuDialog"
 const PAGE_SIZE = 6
 
 export default function MyMenuItemsPage() {
+  const { data: session } = useSession()
+  const user = session?.user
+
   const [menus, setMenus] = useState<MenuItem[]>([])
+  const [menuCount, setMenuCount] = useState(0)
+
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState("All")
   const [status, setStatus] = useState("All")
@@ -43,8 +50,22 @@ export default function MyMenuItemsPage() {
   const [viewingItem, setViewingItem] = useState<MenuItem | null>(null)
 
   useEffect(() => {
-    getMenus().then(setMenus)
-  }, [])
+    if (!user?.id) return
+
+    getMenus().then((data) => {
+      setMenus(
+        data.filter(
+          (item) => String(item.vendorId) === String(user.id)
+        )
+      )
+    })
+
+    getVendorMenuCount(user.id)
+      .then(setMenuCount)
+      .catch((error) => {
+        console.error("Failed to fetch menu count:", error)
+      })
+  }, [user?.id])
 
   const filteredItems = useMemo(
     () =>
@@ -86,6 +107,23 @@ export default function MyMenuItemsPage() {
           Manage and curate your artisan culinary catalog. Only approved and
           active dishes appear to customers on PizzaHub.
         </p>
+
+        {/* Menu Item Count */}
+        <div className="mt-5 flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-[#421d0d]/5">
+          <div className="flex size-11 items-center justify-center rounded-lg bg-[#fff1e5]">
+            <Utensils className="size-5 text-[#806000]" />
+          </div>
+
+          <div>
+            <p className="text-[10px] font-semibold tracking-wider text-[#78675d] uppercase">
+              Total Menu Items
+            </p>
+
+            <p className="mt-0.5 text-2xl font-bold text-[#421d0d] tabular-nums">
+              {menuCount}
+            </p>
+          </div>
+        </div>
 
         {/* Search and Filters */}
         <div className="mt-5 flex flex-col gap-2 rounded-xl bg-white p-2.5 shadow-sm sm:flex-row sm:items-center">
@@ -208,7 +246,6 @@ export default function MyMenuItemsPage() {
                   >
                     <TableCell className="hidden px-4 py-2.5 sm:table-cell">
                       <div className="size-10 overflow-hidden rounded-lg bg-[#fdf2e5]">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={item.imageUrl}
                           alt={item.name}
