@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from "next/link"
@@ -13,6 +12,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/toast"
+
+type SignupRole = Exclude<Role, "admin">
 
 const tabs = [
   { label: "Sign In", href: "/sign-in" },
@@ -33,7 +34,7 @@ const roleOptions = [
     icon: Store,
   },
 ] satisfies {
-  value: Role
+  value: SignupRole
   label: string
   description: string
   icon: typeof User
@@ -78,7 +79,7 @@ const SignUpPage = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "customer" as Role,
+    signupRole: "customer" as SignupRole,
     terms: false,
   })
 
@@ -130,15 +131,16 @@ const SignUpPage = () => {
     try {
       setIsLoading(true)
 
-      const { data, error } = await authClient.signUp.email({
+      const { data, error: signupError } = await authClient.signUp.email({
         name: values.name,
         email: values.email,
         password: values.password,
+        signupRole: values.signupRole,
         callbackURL: "/",
       })
 
-      if (error) {
-        setError(error.message || "Unable to create your account.")
+      if (signupError) {
+        setError(signupError.message || "Unable to create your account.")
         return
       }
 
@@ -155,16 +157,18 @@ const SignUpPage = () => {
   }
 
   const handleGoogleLogin = async () => {
-    const data = await authClient.signIn.social({
-      provider: "google",
-    })
-
-    if (data) {
-      toast.add({
-        type: "success",
-        description: "You have successfully signed in with Google!",
+    try {
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
       })
-      router.push("/")
+
+      if (error) {
+        setError(error.message || "Google sign-in failed.")
+      }
+    } catch (err) {
+      console.error("Google sign-in error:", err)
+      setError("Unable to sign in with Google. Please try again.")
     }
   }
 
@@ -225,7 +229,7 @@ const SignUpPage = () => {
               <div className="mx-auto grid max-w-[228px] grid-cols-2 gap-2">
                 {roleOptions.map((option) => {
                   const Icon = option.icon
-                  const isSelected = values.role === option.value
+                  const isSelected = values.signupRole === option.value
 
                   return (
                     <label
@@ -240,13 +244,13 @@ const SignUpPage = () => {
                     >
                       <input
                         type="radio"
-                        name="role"
+                        name="signupRole"
                         value={option.value}
                         checked={isSelected}
                         onChange={() =>
                           setValues((prev) => ({
                             ...prev,
-                            role: option.value,
+                            signupRole: option.value,
                           }))
                         }
                         className="sr-only"

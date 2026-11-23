@@ -1,24 +1,53 @@
 import { betterAuth } from "better-auth"
 import { MongoClient } from "mongodb"
 import { mongodbAdapter } from "@better-auth/mongo-adapter"
-import { admin as adminPlugin } from "better-auth/plugins"
+import { admin } from "better-auth/plugins"
 
 import { ac, adminRole, customerRole, vendorRole } from "@/lib/auth-permissions"
 
 const client = new MongoClient(process.env.MONGODB_URL as string)
-
 const db = client.db("pizzahubdb")
 
 export const ROLES = ["customer", "vendor", "admin"] as const
-
 export type Role = (typeof ROLES)[number]
+
+const roleSchema = {
+  "~standard": {
+    version: 1 as const,
+    vendor: "pizzahub",
+    validate(value: unknown) {
+      return ROLES.includes(value as Role)
+        ? { value: value as Role }
+        : {
+            issues: [
+              {
+                message: `Role must be one of: ${ROLES.join(", ")}`,
+              },
+            ],
+          }
+    },
+  },
+}
 
 export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
 
-  user: {},
+  user: {
+    additionalFields: {
+      signupRole: {
+        type: "string",
+        required: false,
+        defaultValue: "customer",
+        input: true,
+        returned: false,
+        validator: {
+          input: roleSchema,
+        },
+      },
+    },
+  },
 
   socialProviders: {
     google: {
@@ -27,26 +56,41 @@ export const auth = betterAuth({
     },
   },
 
-  database: mongodbAdapter(db, {
-    client,
-  }),
+  database: mongodbAdapter(db, { client }),
 
   plugins: [
-    adminPlugin({
+    admin({
       ac,
-
       roles: {
         admin: adminRole,
         customer: customerRole,
         vendor: vendorRole,
       },
-
       defaultRole: "customer",
-
       adminRoles: ["admin"],
-
-      bannedUserMessage:
-        "Your account has been blocked. Please contact PizzaHub support.",
     }),
   ],
+
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const signupRole = (
+            user as typeof user & {
+              signupRole?: string
+            }
+          ).signupRole
+
+          const role = signupRole === "vendor" ? "vendor" : "customer"
+
+          return {
+            data: {
+              ...user,
+              role,
+            },
+          }
+        },
+      },
+    },
+  },
 })

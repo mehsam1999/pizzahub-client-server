@@ -1,10 +1,8 @@
-
 import { NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 
 export async function GET() {
   try {
@@ -13,16 +11,12 @@ export async function GET() {
     })
 
     if (!userSession?.user) {
-      return NextResponse.json(
-        { error: "Please login first" },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Please login first" }, { status: 401 })
     }
 
-    const res = await fetch(
-      `${BASE_URL}/users/${userSession.user.id}`,
-      { cache: "no-store" }
-    )
+    const res = await fetch(`${BASE_URL}/users/${userSession.user.id}`, {
+      cache: "no-store",
+    })
 
     if (!res.ok) {
       return NextResponse.json(

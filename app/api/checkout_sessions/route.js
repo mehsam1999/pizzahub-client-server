@@ -71,8 +71,7 @@ export async function POST() {
       },
 
       success_url: `${origin}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-
-      cancel_url: `${origin}/dashboard/vendor/subscription?canceled=true`,
+      cancel_url: `${origin}/subscription/cancel`,
     })
 
     return NextResponse.json({
