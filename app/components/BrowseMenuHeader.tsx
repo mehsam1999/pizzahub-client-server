@@ -14,7 +14,7 @@ import { BrowseMenuFilters } from "./BrowseMenuFilters"
 
 export function BrowseMenuHeader({ locations }: { locations: string[] }) {
   return (
-    <section className="bg-[#fff1df] px-4 py-6 sm:px-8 sm:py-8">
+    <section className="bg-[#fff1df] px-3 py-5 sm:px-8 sm:py-8">
       <motion.div
         variants={staggerContainer}
         initial="hidden"
@@ -30,7 +30,7 @@ export function BrowseMenuHeader({ locations }: { locations: string[] }) {
         </motion.p>
         <motion.h1
           variants={fadeUp}
-          className="mt-3 font-serif text-3xl font-bold sm:text-4xl"
+          className="mt-3 font-serif text-3xl leading-tight font-bold sm:text-4xl"
         >
           Curated Artisan Menu
         </motion.h1>

@@ -169,7 +169,7 @@ const CustomerOrdersPage = () => {
       <div className="mx-auto max-w-7xl">
 
         {/* Header */}
-        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="mb-6 flex flex-col justify-between gap-4 sm:mb-8 sm:flex-row sm:items-end">
           <div>
             <div className="mb-3 flex items-center gap-2">
               <ShoppingBag className="size-4 text-[#c8815a]" />
@@ -179,7 +179,7 @@ const CustomerOrdersPage = () => {
               </p>
             </div>
 
-            <h1 className="font-serif text-3xl font-bold sm:text-4xl">
+            <h1 className="font-serif text-3xl leading-tight font-bold sm:text-4xl">
               Customer Orders
             </h1>
 
@@ -193,7 +193,7 @@ const CustomerOrdersPage = () => {
             type="button"
             onClick={loadOrders}
             disabled={loading}
-            className="h-10 rounded-lg bg-[#421d0d] px-4 text-xs font-semibold text-white hover:bg-[#60301a]"
+            className="h-10 w-full rounded-lg bg-[#421d0d] px-4 text-xs font-semibold text-white transition-colors hover:bg-[#60301a] sm:w-auto"
           >
             <RefreshCw
               size={14}
@@ -206,7 +206,7 @@ const CustomerOrdersPage = () => {
         <div className="mb-7 h-px w-full bg-gradient-to-r from-[#f6c445] via-[#421d0d]/30 to-transparent" />
 
         {/* Summary Cards */}
-        <div className="mb-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="mb-7 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
           <SummaryCard
             title="Total Orders"
             count={orders.length}
@@ -241,7 +241,7 @@ const CustomerOrdersPage = () => {
               key={status}
               type="button"
               onClick={() => setFilter(status)}
-              className={`rounded-full px-4 py-2 text-[11px] font-semibold transition ${
+              className={`min-h-9 rounded-full px-3 py-2 text-[11px] font-semibold transition-colors duration-200 sm:px-4 ${
                 filter === status
                   ? "bg-[#421d0d] text-white"
                   : "border border-[#ead9cc] bg-white text-[#806d60] hover:border-[#421d0d]"

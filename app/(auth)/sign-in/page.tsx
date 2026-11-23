@@ -119,9 +119,9 @@ const SignInPage = () => {
   };
 
   return (
-    <section className="bg-gradient-to-b from-[#fdf6ec] via-[#fdf9f4] to-[#fbeee4] px-5 py-12 sm:px-6 sm:py-16 lg:py-20">
+    <section className="bg-gradient-to-b from-[#fdf6ec] via-[#fdf9f4] to-[#fbeee4] px-3 py-7 sm:px-6 sm:py-16 lg:py-20">
       <div className="mx-auto w-full max-w-md">
-        <div className="rounded-3xl bg-white px-6 py-8 shadow-[0_28px_60px_-40px_rgba(61,32,16,0.5)] ring-1 ring-[#3d2010]/8 sm:px-8 sm:py-9">
+        <div className="rounded-2xl bg-white px-4 py-6 shadow-[0_28px_60px_-40px_rgba(61,32,16,0.5)] ring-1 ring-[#3d2010]/8 min-[380px]:px-6 sm:rounded-3xl sm:px-8 sm:py-9">
 
           <Link
             href="/"

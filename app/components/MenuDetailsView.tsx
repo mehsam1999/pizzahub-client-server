@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react"
@@ -16,16 +15,17 @@ import type { MenuItem } from "@/lib/types/menu"
 import { getMenuItemVendorName } from "@/lib/types/menu"
 import { useSession } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
-import {
-  proccedItemOrder,
-  type OrderForm,
-} from "@/lib/actions/orders"
+import { proccedItemOrder, type OrderForm } from "@/lib/actions/orders"
 import { toast } from "@/components/ui/toast"
 
 export function MenuDetailsView({ menu }: { menu: MenuItem }) {
   const router = useRouter()
   const { data: session } = useSession()
   const user = session?.user
+
+  const canSeeOrderSummary = !user || user.role === "customer"
+
+  const isVendorOrAdmin = user?.role === "vendor" || user?.role === "admin"
 
   const [selectedImage, setSelectedImage] = useState(menu.imageUrl)
   const [customerName, setCustomerName] = useState("")
@@ -57,11 +57,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
       return
     }
 
-    if (
-      !customerName.trim() ||
-      !deliveryDate ||
-      !deliveryAddress.trim()
-    ) {
+    if (!customerName.trim() || !deliveryDate || !deliveryAddress.trim()) {
       toast.add({
         title: "Missing information",
         description: "Please fill in all required fields.",
@@ -115,10 +111,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
           ? error.message
           : "Something went wrong. Please try again."
 
-      if (
-        errorMessage ===
-        "You already have an active order for this item."
-      ) {
+      if (errorMessage === "You already have an active order for this item.") {
         toast.add({
           title: "Already Ordered",
           description: errorMessage,
@@ -164,11 +157,11 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
       </div>
 
       {/* Main Content */}
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-7 px-4 py-8 sm:px-6 lg:grid-cols-[1.35fr_0.95fr] lg:gap-8 lg:py-12">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-3 py-5 sm:gap-7 sm:px-6 sm:py-8 lg:grid-cols-[1.35fr_0.95fr] lg:gap-8 lg:py-12">
         {/* Left Side */}
         <section>
           {/* Main Image */}
-          <div className="relative aspect-[1.45] overflow-hidden rounded-xl bg-[#f5e6da] shadow-sm">
+          <div className="relative aspect-[1.25] overflow-hidden rounded-xl bg-[#f5e6da] shadow-sm sm:aspect-[1.45]">
             <img
               src={selectedImage || menu.imageUrl}
               alt={menu.name}
@@ -183,7 +176,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
           </div>
 
           {/* Image Gallery */}
-          <div className="mt-3 grid grid-cols-4 gap-2">
+          <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">
             {galleryImages.map((image, index) => (
               <button
                 key={`${image}-${index}`}
@@ -205,7 +198,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
           </div>
 
           {/* Information Cards */}
-          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="mt-4 grid grid-cols-1 gap-2 min-[420px]:grid-cols-3">
             <InfoCard
               title="Menu Category"
               value={menu.category}
@@ -220,8 +213,10 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
 
             <InfoCard
               title="Availability"
-              value="Available Item"
-              description="Available to order"
+              value={isVendorOrAdmin ? "Approved Item" : "Available Item"}
+              description={
+                isVendorOrAdmin ? "Approved by admin" : "Available to order"
+              }
             />
           </div>
         </section>
@@ -234,7 +229,7 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
               {menu.category}
             </span>
 
-            <h1 className="mt-2 font-serif text-3xl leading-tight font-bold tracking-tight sm:text-4xl">
+            <h1 className="mt-2 break-words font-serif text-3xl leading-tight font-bold tracking-tight sm:text-4xl">
               {menu.name}
             </h1>
 
@@ -244,7 +239,8 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
               </span>
 
               <span className="text-[10px] text-[#78675d]">
-                Per item • Prepared to order
+                Per item
+                {!isVendorOrAdmin && " • Prepared to order"}
               </span>
             </div>
           </div>
@@ -262,13 +258,9 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                     Menu Vendor
                   </p>
 
-                  <h3 className="truncate text-sm font-bold">
-                    {vendorName}
-                  </h3>
+                  <h3 className="truncate text-sm font-bold">{vendorName}</h3>
 
-                  <p className="text-[10px] text-[#78675d]">
-                    Menu provider
-                  </p>
+                  <p className="text-[10px] text-[#78675d]">Menu provider</p>
                 </div>
               </div>
 
@@ -301,115 +293,113 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
           {/* Category and Location */}
           <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
             <div className="rounded-lg bg-[#fbeadd] p-3">
-              <p className="text-[9px] font-medium text-[#806000]">
-                CATEGORY
-              </p>
+              <p className="text-[9px] font-medium text-[#806000]">CATEGORY</p>
+
               <p className="mt-1 text-xs font-bold">{menu.category}</p>
             </div>
 
             <div className="rounded-lg bg-[#fbeadd] p-3">
-              <p className="text-[9px] font-medium text-[#806000]">
-                LOCATION
-              </p>
-              <p className="mt-1 truncate text-xs font-bold">
-                {menu.location}
-              </p>
+              <p className="text-[9px] font-medium text-[#806000]">LOCATION</p>
+
+              <p className="mt-1 truncate text-xs font-bold">{menu.location}</p>
             </div>
           </div>
 
-          {/* Order Summary */}
-          <div className="mt-auto pt-6">
-            <div className="rounded-xl bg-[#fff0e4] p-4">
-              <p className="mb-3 text-sm font-bold">Order Summary</p>
+          {/* Order Summary - Customer Only */}
+          {canSeeOrderSummary && (
+            <div className="mt-auto pt-6">
+              <div className="rounded-xl bg-[#fff0e4] p-4">
+                <p className="mb-3 text-sm font-bold">Order Summary</p>
 
-              {/* Customer Information */}
-              <div className="mb-4 space-y-3">
-                {/* Customer Name */}
-                <div>
-                  <label className="mb-1 block text-xs font-semibold">
-                    Customer Name
-                  </label>
+                {/* Customer Information */}
+                <div className="mb-4 space-y-3">
+                  {/* Customer Name */}
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold">
+                      Customer Name
+                    </label>
 
-                  <input
-                    type="text"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Enter your full name"
-                    className="h-10 w-full rounded-lg border border-[#ead9cc] bg-white px-3 text-base outline-none focus:border-[#806000] sm:text-xs"
-                  />
+                    <input
+                      type="text"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      placeholder="Enter your full name"
+                      className="h-10 w-full rounded-lg border border-[#ead9cc] bg-white px-3 text-base outline-none focus:border-[#806000] sm:text-xs"
+                    />
+                  </div>
+
+                  {/* Delivery Date */}
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold">
+                      Delivery Date
+                    </label>
+
+                    <input
+                      type="date"
+                      value={deliveryDate}
+                      min={new Date().toISOString().split("T")[0]}
+                      onChange={(e) => setDeliveryDate(e.target.value)}
+                      className="h-10 w-full rounded-lg border border-[#ead9cc] bg-white px-3 text-base outline-none focus:border-[#806000] sm:text-xs"
+                    />
+                  </div>
+
+                  {/* Delivery Address */}
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold">
+                      Delivery Address
+                    </label>
+
+                    <textarea
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      placeholder="Enter your delivery address"
+                      rows={3}
+                      className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-base outline-none focus:border-[#806000] sm:text-xs"
+                    />
+                  </div>
+
+                  {/* Additional Message */}
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold">
+                      Additional Message (Optional)
+                    </label>
+
+                    <textarea
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder="Any special instructions?"
+                      rows={2}
+                      className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-base outline-none focus:border-[#806000] sm:text-xs"
+                    />
+                  </div>
                 </div>
 
-                {/* Delivery Date */}
-                <div>
-                  <label className="mb-1 block text-xs font-semibold">
-                    Delivery Date
-                  </label>
+                {/* Price Details */}
+                <div className="space-y-2 border-t border-[#ead9cc] pt-3">
+                  <div className="flex justify-between text-xs text-[#78675d]">
+                    <span>Price per item</span>
+                    <span>${price.toFixed(2)}</span>
+                  </div>
 
-                  <input
-                    type="date"
-                    value={deliveryDate}
-                    min={new Date().toISOString().split("T")[0]}
-                    onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="h-10 w-full rounded-lg border border-[#ead9cc] bg-white px-3 text-base outline-none focus:border-[#806000] sm:text-xs"
-                  />
+                  <div className="flex justify-between border-t border-[#ead9cc] pt-3 text-sm font-bold">
+                    <span>Total</span>
+                    <span>${price.toFixed(2)}</span>
+                  </div>
                 </div>
 
-                {/* Delivery Address */}
-                <div>
-                  <label className="mb-1 block text-xs font-semibold">
-                    Delivery Address
-                  </label>
-
-                  <textarea
-                    value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                    placeholder="Enter your delivery address"
-                    rows={3}
-                    className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-base outline-none focus:border-[#806000] sm:text-xs"
-                  />
-                </div>
-
-                {/* Additional Message */}
-                <div>
-                  <label className="mb-1 block text-xs font-semibold">
-                    Additional Message (Optional)
-                  </label>
-
-                  <textarea
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Any special instructions?"
-                    rows={2}
-                    className="w-full rounded-lg border border-[#ead9cc] bg-white px-3 py-2 text-base outline-none focus:border-[#806000] sm:text-xs"
-                  />
-                </div>
+                {/* Proceed to Order */}
+                <button
+                  type="button"
+                  onClick={handleMenuOrder}
+                  disabled={isSubmitting}
+                  className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#ffcc42] px-3 text-center text-[11px] font-bold text-[#421d0d] transition-colors hover:bg-[#f4bb28] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <ShoppingBag size={14} />
+                  {isSubmitting ? "Placing Order..." : "Proceed to Order"}
+                </button>
               </div>
-
-              {/* Price Details */}
-              <div className="space-y-2 border-t border-[#ead9cc] pt-3">
-                <div className="flex justify-between text-xs text-[#78675d]">
-                  <span>Price per item</span>
-                  <span>${price.toFixed(2)}</span>
-                </div>
-
-                <div className="flex justify-between border-t border-[#ead9cc] pt-3 text-sm font-bold">
-                  <span>Total</span>
-                  <span>${price.toFixed(2)}</span>
-                </div>
-              </div>
-
-              {/* Proceed to Order */}
-              <button
-                type="button"
-                onClick={handleMenuOrder}
-                disabled={isSubmitting}
-                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#ffcc42] px-3 text-center text-[11px] font-bold text-[#421d0d] transition-colors hover:bg-[#f4bb28] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <ShoppingBag size={14} />
-                {isSubmitting ? "Placing Order..." : "Proceed to Order"}
-              </button>
             </div>
-          </div>
+          )}
         </section>
       </div>
     </main>
@@ -427,15 +417,11 @@ function InfoCard({
 }) {
   return (
     <div className="rounded-xl bg-[#fbeadd] p-3">
-      <p className="text-[9px] font-semibold text-[#806000]">
-        {title}
-      </p>
+      <p className="text-[9px] font-semibold text-[#806000]">{title}</p>
 
       <h3 className="mt-1 text-sm font-bold">{value}</h3>
 
-      <p className="mt-1 text-[9px] text-[#78675d]">
-        {description}
-      </p>
+      <p className="mt-1 text-[9px] text-[#78675d]">{description}</p>
     </div>
   )
 }

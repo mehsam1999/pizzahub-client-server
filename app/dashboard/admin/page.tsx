@@ -165,7 +165,7 @@ const AdminOverviewPage = () => {
   ]
 
   return (
-    <div className="min-h-screen space-y-8 bg-[#fdf8f1] p-4 md:p-8">
+    <div className="min-h-screen space-y-6 bg-[#fdf8f1] p-3 sm:space-y-8 sm:p-4 md:p-8">
 
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -182,7 +182,7 @@ const AdminOverviewPage = () => {
         <button
           onClick={() => loadOverview(true)}
           disabled={loading}
-          className="flex items-center justify-center gap-2 rounded-lg bg-[#3d2010] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#5a321c] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#3d2010] px-5 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#5a321c] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           <RefreshCw
             size={16}
@@ -207,7 +207,7 @@ const AdminOverviewPage = () => {
       )}
 
       {/* Overview Cards */}
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
         {cards.map((card) => {
           const Icon = card.icon
 
@@ -215,11 +215,11 @@ const AdminOverviewPage = () => {
             <Link
               href={card.href}
               key={card.title}
-              className="group rounded-xl border border-[#eadfd2] bg-white p-5 transition duration-200 hover:-translate-y-1 hover:border-[#c9a77f] hover:shadow-md"
+              className="group min-w-0 rounded-xl border border-[#eadfd2] bg-white p-4 transition duration-200 hover:-translate-y-1 hover:border-[#c9a77f] hover:shadow-md sm:p-5 motion-reduce:transform-none motion-reduce:transition-none"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[#8a7565]">
+                  <p className="break-words text-sm font-medium text-[#8a7565]">
                     {card.title}
                   </p>
 

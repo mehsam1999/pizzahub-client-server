@@ -37,6 +37,18 @@ export type Order = OrderForm & {
 
 // Customer places an order
 export const proccedItemOrder = async (data: OrderForm) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
+  if (!session?.user || session.user.role !== "customer") {
+    throw new Error("Only customers can place orders.")
+  }
+
+  if (data.userId !== session.user.id) {
+    throw new Error("You can only place orders for your own account.")
+  }
+
   const res = await fetch(`${BASE_URL}/orders`, {
     method: "POST",
     headers: {

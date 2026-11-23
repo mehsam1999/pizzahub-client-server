@@ -1,14 +1,10 @@
-
 "use client"
 
 import { AnimatePresence, motion } from "motion/react"
 import { MapPin, Store, Search } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-import {
-  getMenuItemVendorName,
-  type MenuItem,
-} from "@/lib/types/menu"
+import { getMenuItemVendorName, type MenuItem } from "@/lib/types/menu"
 
 export function BrowseMenuGrid({ menus }: { menus: MenuItem[] }) {
   return (
@@ -24,10 +20,7 @@ export function BrowseMenuGrid({ menus }: { menus: MenuItem[] }) {
             className="flex flex-col items-center justify-center py-20 text-center"
           >
             <div className="mb-4 flex size-16 items-center justify-center rounded-full bg-[#fdf2e5]">
-              <Search
-                className="size-7 text-[#806000]"
-                strokeWidth={1.7}
-              />
+              <Search className="size-7 text-[#806000]" strokeWidth={1.7} />
             </div>
 
             <h3 className="font-serif text-lg font-bold text-[#421d0d]">
@@ -43,15 +36,11 @@ export function BrowseMenuGrid({ menus }: { menus: MenuItem[] }) {
           <motion.div
             key="menu-grid"
             layout
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
           >
             <AnimatePresence mode="popLayout">
               {menus.map((menu, index) => (
-                <MenuCard
-                  key={menu._id}
-                  menu={menu}
-                  index={index}
-                />
+                <MenuCard key={menu._id} menu={menu} index={index} />
               ))}
             </AnimatePresence>
           </motion.div>
@@ -61,13 +50,7 @@ export function BrowseMenuGrid({ menus }: { menus: MenuItem[] }) {
   )
 }
 
-function MenuCard({
-  menu,
-  index,
-}: {
-  menu: MenuItem
-  index: number
-}) {
+function MenuCard({ menu, index }: { menu: MenuItem; index: number }) {
   const router = useRouter()
   const vendorName = getMenuItemVendorName(menu)
 
@@ -90,9 +73,10 @@ function MenuCard({
         y: -5,
         transition: { duration: 0.2 },
       }}
-      className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-[#421d0d]/8 transition-shadow hover:shadow-lg"
+      className="flex h-full flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-[#421d0d]/8 transition-[box-shadow,transform] duration-300 hover:shadow-lg motion-reduce:transition-none"
     >
-      <div className="relative aspect-[1.45] bg-[#fdf2e5]">
+      {/* Fixed Image Height */}
+      <div className="relative h-48 shrink-0 overflow-hidden bg-[#fdf2e5] sm:h-52">
         <img
           src={menu.imageUrl}
           alt={menu.name}
@@ -108,39 +92,48 @@ function MenuCard({
         </span>
       </div>
 
-      <div className="p-3">
-        <div className="flex items-start justify-between gap-2">
-          <h2 className="font-serif text-sm font-bold">
+      {/* Card Content */}
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
+        {/* Menu Name and Price */}
+        {/* Menu Name and Price */}
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+          <h2 className="min-w-0 font-serif text-sm leading-6 font-bold break-words sm:text-base">
             {menu.name}
           </h2>
 
-          <span className="shrink-0 text-xs font-bold tabular-nums">
+          <span className="text-xs font-bold whitespace-nowrap tabular-nums">
             ${Number(menu.price).toFixed(2)}
           </span>
         </div>
 
-        {vendorName && (
-          <div className="mt-1 flex items-center gap-1.5">
-            <Store className="size-3.5 shrink-0 text-[#806000]" />
-            <p className="text-[12px] font-medium text-[#806000]">
-              {vendorName}
-            </p>
-          </div>
-        )}
+        {/* Vendor Name */}
+        <div className="mt-1 flex min-h-5 items-center gap-1.5">
+          {vendorName && (
+            <>
+              <Store className="size-3.5 shrink-0 text-[#806000]" />
+              <p className="truncate text-xs font-medium text-[#806000]">
+                {vendorName}
+              </p>
+            </>
+          )}
+        </div>
 
-        <p className="mt-1 line-clamp-2 text-[10px] leading-relaxed text-[#78675d]">
+        {/* Description */}
+        <p className="mt-2 line-clamp-2 min-h-10 text-[10px] leading-5 text-[#78675d]">
           {menu.description}
         </p>
 
-        <p className="mt-2 flex items-center gap-1 text-[10px] text-[#6b5a4e]">
-          <MapPin size={12} />
-          {menu.location}
+        {/* Location */}
+        <p className="mt-2 mb-2 flex min-h-5 items-center gap-1 text-[10px] text-[#6b5a4e]">
+          <MapPin size={12} className="shrink-0" />
+          <span className="truncate">{menu.location}</span>
         </p>
 
+        {/* Button */}
         <button
           type="button"
           onClick={handleViewDetails}
-          className="mt-3 h-8 w-full rounded-md bg-[#ffcc42] text-[10px] font-semibold text-[#421d0d] transition-colors hover:bg-[#f4bb28]"
+          className="mt-auto h-9 w-full rounded-md bg-[#ffcc42] text-[10px] font-semibold text-[#421d0d] transition-colors hover:bg-[#f4bb28]"
         >
           View Details →
         </button>

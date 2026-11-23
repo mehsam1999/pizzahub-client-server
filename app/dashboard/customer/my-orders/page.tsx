@@ -154,7 +154,7 @@ const CustomerMyOrdersPage = () => {
           From Kitchen to Doorstep
         </p>
 
-        <h1 className="mt-2 font-serif text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="mt-2 font-serif text-3xl leading-tight font-bold tracking-tight sm:text-4xl">
           My Orders
         </h1>
 
@@ -163,7 +163,7 @@ const CustomerMyOrdersPage = () => {
         </p>
 
         {/* Search and Status Filter */}
-        <div className="mt-5 rounded-xl bg-[#fdf2e5] p-2.5">
+        <div className="mt-5 rounded-xl bg-[#fdf2e5] p-2 sm:p-2.5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <OrderSearchFilter
               value={query}

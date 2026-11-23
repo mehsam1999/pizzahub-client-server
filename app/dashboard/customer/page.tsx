@@ -116,11 +116,11 @@ const CustomerDashboardPage = () => {
             PizzaHub Customer Panel
           </p>
 
-          <h1 className="mt-2 font-serif text-3xl font-bold tracking-tight sm:text-4xl">
+          <h1 className="mt-2 font-serif text-3xl leading-tight font-bold tracking-tight sm:text-4xl">
             Customer Dashboard
           </h1>
 
-          <p className="mt-2 text-sm text-[#6b5a4e]">
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#6b5a4e]">
             Welcome back, {session?.user?.name || "Customer"}!
             Here is your order overview.
           </p>
@@ -132,14 +132,14 @@ const CustomerDashboardPage = () => {
             Order Overview
           </h2>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:gap-4 xl:grid-cols-4">
             {stats.map((stat) => {
               const Icon = stat.icon
 
               return (
                 <div
                   key={stat.title}
-                  className="rounded-xl border border-[#ead9cc] bg-white p-5 shadow-sm"
+                  className="rounded-xl border border-[#ead9cc] bg-white p-4 shadow-sm transition-shadow duration-200 hover:shadow-md sm:p-5"
                 >
                   <div className="flex items-center justify-between">
                     <div>
