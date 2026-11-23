@@ -12,7 +12,7 @@ const exploreLinks = [
 const accountLinks = [
   { label: "Sign In", href: "/sign-in" },
   { label: "Sign Up", href: "/sign-up" },
-  { label: "My Orders", href: "/my-orders" },
+  { label: "My Orders", href: "/dashboard/customer/my-orders" },
 ]
 
 const legalLinks = [
