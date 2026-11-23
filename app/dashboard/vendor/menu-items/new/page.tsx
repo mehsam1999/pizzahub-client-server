@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import Image from "next/image"
 
 import { createMenu } from "@/lib/actions/menu"
 import { toast } from "@/components/ui/toast"
@@ -352,11 +353,14 @@ const AddMenuItemPage = () => {
             </div>
 
             {form.imageUrl.trim() ? (
-              <div className="mt-3 overflow-hidden rounded-lg bg-[#fdf2e5] ring-1 ring-[#421d0d]/8">
-                <img
+              <div className="relative mt-3 h-40 overflow-hidden rounded-lg bg-[#fdf2e5] ring-1 ring-[#421d0d]/8">
+                <Image
                   src={form.imageUrl}
                   alt="Main menu item preview"
-                  className="h-40 w-full object-cover"
+                  fill
+                  unoptimized
+                  sizes="(max-width: 768px) 100vw, 768px"
+                  className="object-cover"
                 />
 
                 <div className="bg-[#fbeadd] px-3 py-2">
@@ -434,11 +438,14 @@ const AddMenuItemPage = () => {
                   </div>
 
                   {image.trim() && (
-                    <div className="mt-3 overflow-hidden rounded-lg bg-[#fdf2e5] ring-1 ring-[#421d0d]/8">
-                      <img
+                    <div className="relative mt-3 h-32 overflow-hidden rounded-lg bg-[#fdf2e5] ring-1 ring-[#421d0d]/8">
+                      <Image
                         src={image}
                         alt={`Gallery image preview ${index + 1}`}
-                        className="h-32 w-full object-cover"
+                        fill
+                        unoptimized
+                        sizes="(max-width: 768px) 100vw, 768px"
+                        className="object-cover"
                       />
 
                       <p className="bg-[#fbeadd] px-3 py-2 text-[10px] font-medium text-[#421d0d]">

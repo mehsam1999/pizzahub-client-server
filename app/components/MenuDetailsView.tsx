@@ -10,6 +10,7 @@ import {
   ShoppingBag,
   BadgeCheck,
 } from "lucide-react"
+import Image from "next/image"
 
 import type { MenuItem } from "@/lib/types/menu"
 import { getMenuItemVendorName } from "@/lib/types/menu"
@@ -39,7 +40,6 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
   )
 
   const vendorName = getMenuItemVendorName(menu) || "PizzaHub Vendor"
-
   const price = Number(menu.price) || 0
 
   const handleMenuOrder = async () => {
@@ -159,16 +159,19 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
       {/* Main Content */}
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-3 py-5 sm:gap-7 sm:px-6 sm:py-8 lg:grid-cols-[1.35fr_0.95fr] lg:gap-8 lg:py-12">
         {/* Left Side */}
-        <section>
+        <section className="min-w-0">
           {/* Main Image */}
-          <div className="relative aspect-[1.25] overflow-hidden rounded-xl bg-[#f5e6da] shadow-sm sm:aspect-[1.45]">
-            <img
+          <div className="relative h-[260px] w-full overflow-hidden rounded-xl bg-[#f5e6da] shadow-sm sm:h-[360px] lg:h-[460px]">
+            <Image
               src={selectedImage || menu.imageUrl}
               alt={menu.name}
-              className="h-full w-full object-cover"
+              fill
+              priority
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+              className="object-cover"
             />
 
-            <div className="absolute top-3 left-3">
+            <div className="absolute top-3 left-3 z-10">
               <span className="rounded-full bg-[#421d0d]/85 px-3 py-1.5 text-[10px] font-medium text-white">
                 {menu.category}
               </span>
@@ -182,16 +185,18 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                 key={`${image}-${index}`}
                 type="button"
                 onClick={() => setSelectedImage(image)}
-                className={`aspect-[1.35] overflow-hidden rounded-lg border-2 ${
+                className={`relative aspect-[1.35] w-full overflow-hidden rounded-lg border-2 ${
                   selectedImage === image
                     ? "border-[#421d0d]"
                     : "border-transparent opacity-70 hover:opacity-100"
                 }`}
               >
-                <img
+                <Image
                   src={image}
                   alt={`${menu.name} preview ${index + 1}`}
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="(max-width: 640px) 25vw, 160px"
+                  className="object-cover"
                 />
               </button>
             ))}
@@ -222,14 +227,14 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
         </section>
 
         {/* Right Side */}
-        <section className="flex flex-col">
+        <section className="flex min-w-0 flex-col">
           {/* Title and Price */}
           <div>
             <span className="rounded-full bg-[#f5e6da] px-2.5 py-1 text-[9px] font-medium">
               {menu.category}
             </span>
 
-            <h1 className="mt-2 break-words font-serif text-3xl leading-tight font-bold tracking-tight sm:text-4xl">
+            <h1 className="mt-2 font-serif text-3xl leading-tight font-bold tracking-tight break-words sm:text-4xl">
               {menu.name}
             </h1>
 
@@ -313,7 +318,6 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
 
                 {/* Customer Information */}
                 <div className="mb-4 space-y-3">
-                  {/* Customer Name */}
                   <div>
                     <label className="mb-1 block text-xs font-semibold">
                       Customer Name
@@ -328,7 +332,6 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                     />
                   </div>
 
-                  {/* Delivery Date */}
                   <div>
                     <label className="mb-1 block text-xs font-semibold">
                       Delivery Date
@@ -343,7 +346,6 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                     />
                   </div>
 
-                  {/* Delivery Address */}
                   <div>
                     <label className="mb-1 block text-xs font-semibold">
                       Delivery Address
@@ -358,7 +360,6 @@ export function MenuDetailsView({ menu }: { menu: MenuItem }) {
                     />
                   </div>
 
-                  {/* Additional Message */}
                   <div>
                     <label className="mb-1 block text-xs font-semibold">
                       Additional Message (Optional)

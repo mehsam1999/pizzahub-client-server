@@ -31,6 +31,7 @@ import type { MenuItem } from "@/lib/types/menu"
 import { DeleteMenuDialog } from "@/app/components/DeleteMenuDialog"
 import { EditMenuDialog } from "@/app/components/EditMenuDialog"
 import { ViewMenuDialog } from "@/app/components/ViewMenuDialog"
+import Image from "next/image"
 
 const PAGE_SIZE = 6
 
@@ -245,11 +246,14 @@ export default function MyMenuItemsPage() {
                     className={`border-[#421d0d]/5 ${item.status === "Rejected" ? "opacity-60" : ""}`}
                   >
                     <TableCell className="hidden px-4 py-2.5 sm:table-cell">
-                      <div className="size-10 overflow-hidden rounded-lg bg-[#fdf2e5]">
-                        <img
+                      <div className="relative size-10 overflow-hidden rounded-lg bg-[#fdf2e5]">
+                        <Image
                           src={item.imageUrl}
                           alt={item.name}
-                          className="size-full object-cover"
+                          fill
+                          unoptimized
+                          sizes="40px"
+                          className="object-cover"
                         />
                       </div>
                     </TableCell>

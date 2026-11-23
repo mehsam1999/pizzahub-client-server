@@ -87,7 +87,13 @@ const HowItWorks = () => {
           )}
         >
           {steps.map(({ number, title, description }) => (
-            <motion.li key={number} variants={fadeUp} className="h-full">
+            <motion.li
+              key={number}
+              variants={fadeUp}
+              whileHover={{ y: -3 }}
+              transition={{ duration: 0.2 }}
+              className="h-full"
+            >
               <Card
                 size="sm"
                 className="h-full gap-4 rounded-2xl bg-white py-7 text-center ring-1 ring-[#3d2010]/5 shadow-[0_18px_40px_-28px_rgba(61,32,16,0.45)] [--card-spacing:1.375rem] sm:[--card-spacing:1.5rem] sm:py-8 md:[--card-spacing:1.125rem] lg:[--card-spacing:1.5rem]"

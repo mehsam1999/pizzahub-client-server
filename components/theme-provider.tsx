@@ -1,7 +1,8 @@
+
 "use client"
 
 import * as React from "react"
-import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes"
+import { ThemeProvider as NextThemesProvider, useTheme } from "@teispace/next-themes"
 
 function ThemeProvider({
   children,
@@ -13,7 +14,6 @@ function ThemeProvider({
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
-      scriptProps={{ async: true }}
       {...props}
     >
       <ThemeHotkey />

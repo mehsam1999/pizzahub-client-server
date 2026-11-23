@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 
 import { useSession } from "@/lib/auth-client"
+import Image from "next/image"
 import {
   getAdminMenus,
   updateAdminMenuStatus,
@@ -444,11 +445,14 @@ export default function AdminMenuItemsPage() {
                     >
                       <TableCell className="px-5 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="size-12 shrink-0 overflow-hidden rounded-lg bg-[#fdf2e5]">
-                            <img
+                          <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-[#fdf2e5]">
+                            <Image
                               src={item.imageUrl}
                               alt={item.name}
-                              className="size-full object-cover"
+                              fill
+                              unoptimized
+                              sizes="48px"
+                              className="object-cover"
                             />
                           </div>
                           <div className="max-w-[220px]">
@@ -626,9 +630,13 @@ export default function AdminMenuItemsPage() {
               </Button>
             </div>
 
-            <img
+            <Image
               src={selectedItem.imageUrl}
               alt={selectedItem.name}
+              width={1200}
+              height={600}
+              unoptimized
+              sizes="(max-width: 640px) 100vw, 576px"
               className="mt-5 h-52 w-full rounded-xl object-cover"
             />
 
@@ -684,10 +692,14 @@ export default function AdminMenuItemsPage() {
                 </p>
                 <div className="grid grid-cols-3 gap-2">
                   {selectedItem.images.map((image, index) => (
-                    <img
+                    <Image
                       key={`${image}-${index}`}
                       src={image}
                       alt={`${selectedItem.name} gallery ${index + 1}`}
+                      width={400}
+                      height={300}
+                      unoptimized
+                      sizes="(max-width: 640px) 33vw, 180px"
                       className="h-24 w-full rounded-lg object-cover"
                     />
                   ))}

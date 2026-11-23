@@ -6,7 +6,7 @@ import type { ComponentProps } from "react"
 const exploreLinks = [
   { label: "Home", href: "/" },
   { label: "Browse Menu", href: "/browse-menus" },
-  { label: "Pizza Categories", href: "/menu/categories" },
+  { label: "Pizza Categories", href: "/browse-menus" },
 ]
 
 const accountLinks = [

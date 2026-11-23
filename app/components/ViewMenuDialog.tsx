@@ -4,6 +4,7 @@
 import { X } from "lucide-react"
 import type { MenuItem } from "@/lib/types/menu"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 type ViewMenuDialogProps = {
   item: MenuItem | null
@@ -66,12 +67,14 @@ export function ViewMenuDialog({
 
         <div className="p-5">
           {/* Main Image */}
-          <div className="overflow-hidden rounded-xl bg-[#fdf0e4]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+          <div className="relative h-64 overflow-hidden rounded-xl bg-[#fdf0e4] sm:h-80">
+            <Image
               src={item.imageUrl}
               alt={item.name}
-              className="h-64 w-full object-cover sm:h-80"
+              fill
+              unoptimized
+              sizes="(max-width: 640px) 100vw, 672px"
+              className="object-cover"
             />
           </div>
 
@@ -81,13 +84,15 @@ export function ViewMenuDialog({
               {images.map((image, index) => (
                 <div
                   key={`${image}-${index}`}
-                  className="h-20 overflow-hidden rounded-lg bg-[#fdf0e4]"
+                  className="relative h-20 overflow-hidden rounded-lg bg-[#fdf0e4]"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={image}
                     alt={`${item.name} ${index + 1}`}
-                    className="size-full object-cover"
+                    fill
+                    unoptimized
+                    sizes="(max-width: 640px) 25vw, 150px"
+                    className="object-cover"
                   />
                 </div>
               ))}

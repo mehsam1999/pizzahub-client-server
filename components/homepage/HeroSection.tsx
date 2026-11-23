@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, Zap } from "lucide-react"
+import * as motion from "motion/react-client"
 
 const HeroSection = () => {
   return (
@@ -25,7 +26,12 @@ const HeroSection = () => {
           {/* Empty column lets the pizza photography breathe on desktop */}
           <div aria-hidden className="hidden lg:block" />
 
-          <div className="max-w-xl">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, ease: [0.22, 0.61, 0.36, 1] }}
+            className="max-w-xl"
+          >
             <h1
               className="hero-rise text-[2rem] leading-[0.98] font-extrabold tracking-[-0.02em] text-[#f8f0dc] uppercase min-[420px]:text-[2.4rem] sm:text-[3rem] md:text-[3.6rem] lg:text-[3.05rem] xl:text-[3.85rem]"
               style={{ animationDelay: "0ms" }}
@@ -51,7 +57,7 @@ const HeroSection = () => {
             >
               <Link
                 href="/browse-menus"
-                className="group inline-flex h-12 items-center gap-2 rounded-full bg-[#f7c445] px-6 text-sm font-semibold text-[#231306] shadow-[0_10px_30px_-10px_rgba(247,196,69,0.7)] transition-colors hover:bg-[#ffd45e] focus-visible:ring-3 focus-visible:ring-[#f7c445]/50 focus-visible:outline-none sm:h-13 sm:px-7 sm:text-[15px]"
+                className="group inline-flex h-12 items-center gap-2 rounded-full bg-[#f7c445] px-6 text-sm font-semibold text-[#231306] shadow-[0_10px_30px_-10px_rgba(247,196,69,0.7)] transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-[#ffd45e] focus-visible:ring-3 focus-visible:ring-[#f7c445]/50 focus-visible:outline-none sm:h-13 sm:px-7 sm:text-[15px] motion-reduce:transform-none motion-reduce:transition-none"
               >
                 Explore Pizza Menu
                 <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -62,7 +68,7 @@ const HeroSection = () => {
                 Delivery in 25–35 min &bull; Free over $35
               </span>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

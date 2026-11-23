@@ -19,6 +19,7 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import { OrderStatusBadge } from "@/app/components/OrderStatusBadge"
 import { CancelOrderDialog } from "@/app/components/CancelOrderDialog"
 import type { Order } from "@/lib/actions/orders"
+import Image from "next/image"
 
 type MyOrderRowProps = {
   order: Order
@@ -53,11 +54,14 @@ export function MyOrderRow({
 
         {/* Item Image */}
         <TableCell className="w-[100px] px-3 py-4 align-top whitespace-normal lg:px-4">
-          <div className="size-12 overflow-hidden rounded-lg bg-[#fdf2e5] lg:size-14">
-            <img
+          <div className="relative size-12 overflow-hidden rounded-lg bg-[#fdf2e5] lg:size-14">
+            <Image
               src={order.imageUrl}
               alt={order.itemName}
-              className="size-full object-cover"
+              fill
+              unoptimized
+              sizes="56px"
+              className="object-cover"
             />
           </div>
         </TableCell>
@@ -158,11 +162,14 @@ export function MyOrderRow({
 
             {/* Item Header */}
             <div className="flex gap-3">
-              <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-[#fdf2e5] sm:size-16">
-                <img
+              <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-[#fdf2e5] sm:size-16">
+                <Image
                   src={order.imageUrl}
                   alt={order.itemName}
-                  className="size-full object-cover"
+                  fill
+                  unoptimized
+                  sizes="64px"
+                  className="object-cover"
                 />
               </div>
 

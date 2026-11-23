@@ -97,7 +97,13 @@ const WhyChooseUs = () => {
           )}
         >
           {features.map(({ icon: Icon, title, description }) => (
-            <motion.li key={title} variants={fadeUp} className="h-full">
+            <motion.li
+              key={title}
+              variants={fadeUp}
+              whileHover={{ y: -3 }}
+              transition={{ duration: 0.2 }}
+              className="h-full"
+            >
               <Card
                 size="sm"
                 className="h-full gap-5 rounded-2xl bg-[#fdf2e5] py-6 text-card-foreground ring-1 ring-[#e8d3ba]/50 transition-shadow duration-300 hover:shadow-[0_18px_40px_-28px_rgba(61,32,16,0.45)] [--card-spacing:1.25rem] sm:[--card-spacing:1.5rem]"
